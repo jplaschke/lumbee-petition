@@ -73,6 +73,11 @@ def progress():
     percent  = min(int((count / settings.target_signatures) * 100), 100)
     return jsonify({'count': count, 'target': settings.target_signatures, 'percent': percent})
 
+@main_bp.route('/ordinance')
+def view_ordinance():
+    """Render the styled ordinance viewer page"""
+    return render_template('ordinance.html')
+
 @admin_bp.route('/login', methods=['GET','POST'])
 def login():
     form = LoginForm()
@@ -133,9 +138,4 @@ def setup():
         db.session.commit()
         return f'Admin {username} created!'
     return 'Admin already exists.'
-
-@main.route('/ordinance')
-def view_ordinance():
-    """Render the styled ordinance viewer page"""
-    return render_template('ordinance.html')
 
