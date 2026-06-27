@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Sign the Petition{% endblock %}
+{% block content %}
+<section class="form-page">
+  <div class="form-box">
+    <div class="form-top">
+      <img src="{{ url_for('static', filename='images/' + s.tribe_logo) }}"
+           alt="Logo" class="form-logo" onerror="this.style.display='none'">
+      <h1><i class="fas fa-pen-nib"></i> Sign the Petition</h1>
+      <p>{{ s.petition_title }}</p>
+      <div class="mini-prog">
+        <span>{{ p.current }} / {{ p.target }} signatures collected</span>
+        <div class="mini-track"><div class="mini-fill" style="width:{{ p.percent }}%"></div></div>
+      </div>
+    </div>
+    {% if errors %}
+    <div class="alert alert-error">
+      <i class="fas fa-exclamation-triangle"></i>
+      <ul>{% for e in errors %}<li>{{ e }}</li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+    <div class="alert alert-info">
+      <i class="fas fa-info-circle"></i>
+      Only enrolled Lumbee Tribe members may sign. Duplicate submissions are blocked and logged.
+    </div>
+    <form id="petitionForm" method="POST"
+          action="{{ url_for('main.sign') }}"
+          enctype="multipart/form-data" novalidate>
+      <div class="field-grid">
+        <div class="field span2">
+          <label for="full_name"><i class="fas fa-user"></i> Full Legal Name *</label>
+          <input type="text" id="full_name" name="full_name"
+                 placeholder="As it appears on enrollment records" required>
+        </div>
+        <div class="field">
+          <label for="enrollment_id"><i class="fas fa-id-badge"></i> Enrollment ID *</label>
+          <input type="text" id="enrollment_id" name="enrollment_id"
+                 placeholder="e.g. LT-00000" required style="text-transform:uppercase">
+        </div>
+        <div class="field">
+          <label for="email"><i class="fas fa-envelope"></i> Email Address *</label>
+          <input type="email" id="email" name="email" placeholder="you@example.com" required>
+        </div>
+        <div class="field">
+          <label for="phone"><i class="fas fa-phone"></i> Phone <span class="opt">(optional)</span></label>
+          <input type="tel" id="phone" name="phone" placeholder="(910) 555-0000">
+        </div>
+        <div class="field">
+          <label for="id_card_expiry"><i class="fas fa-calendar-alt"></i> Member ID Expiry Date *</label>
+          <input type="date" id="id_card_expiry" name="id_card_expiry" required>
+          <small>Card must not be expired</small>
+        </div>
+        <div class="field span2">
+          <label><i class="fas fa-camera"></i> Upload Member ID Card *</label>
+          <div class="drop-zone" id="dropZone">
+            <input type="file" id="id_card" name="id_card"
+                   accept=".jpg,.jpeg,.png,.pdf" required>
+            <div class="dz-inner" id="dzInner">
+              <i class="fas fa-cloud-upload-alt"></i>
+              <p>Drag &amp; drop or <u>click to browse</u></p>
+              <small>JPG · PNG · PDF — max 16 MB</small>
+            </div>
+          </div>
+        </div>
+        <div class="field span2">
+          <label class="check-label">
+            <input type="checkbox" id="certify" required>
+            <span>I certify under penalty of tribal law that I am an enrolled member of the Lumbee Tribe of North Carolina, and all information is true and accurate.</span>
+          </label>
+        </div>
+      </div>
+      <button type="submit" class="submit-btn" id="submitBtn">
+        <i class="fas fa-pen-nib"></i> Submit My Signature
+      </button>
+    </form>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <div class="hero-overlay"></div>
+  <div class="hero-body">
+    <span class="hero-badge"><i class="fas fa-feather-alt"></i> Official Tribal Petition</span>
+    <h1 class="hero-title">{{ s.petition_title }}</h1>
+    {% if s.petition_description %}
+    <p class="hero-desc">{{ s.petition_description }}</p>
+    {% endif %}
+    <div class="progress-widget">
+      <div class="pw-stats">
+        <div class="pw-stat">
+          <span class="pw-num" id="live-count">{{ p.current }}</span>
+          <span class="pw-lbl">Signatures</span>
+        </div>
+        <div class="pw-divider"></div>
+        <div class="pw-stat">
+          <span class="pw-num">{{ p.target }}</span>
+          <span class="pw-lbl">Goal (10%)</span>
+        </div>
+        <div class="pw-divider"></div>
+        <div class="pw-stat">
+          <span class="pw-num">{{ p.percent }}%</span>
+          <span class="pw-lbl">Complete</span>
+        </div>
+      </div>
+      <div class="pw-track">
+        <div class="pw-fill" data-pct="{{ p.percent }}" style="width:0%"></div>
+      </div>
+      {% if p.met %}
+      <div class="pw-met"><i class="fas fa-trophy"></i> 10% Threshold Achieved</div>
+      {% endif %}
+    </div>
+    <a href="{{ url_for('main.sign') }}" class="hero-btn">
+      <i class="fas fa-pen-nib"></i> Sign the Petition
+    </a>
+  </div>
+</section>
+<section class="cards-section">
+  <div class="cards-grid">
+    <div class="card">
+      <div class="card-icon"><i class="fas fa-user-check"></i></div>
+      <h3>Who Can Sign</h3>
+      <p>Enrolled members of the Lumbee Tribe of North Carolina with a valid, non-expired Member ID card.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon"><i class="fas fa-id-card"></i></div>
+      <h3>What You Need</h3>
+      <p>Your Enrollment ID number and a photo or scan of your Lumbee Tribe Member ID card.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon"><i class="fas fa-lock"></i></div>
+      <h3>Your Privacy</h3>
+      <p>All data is encrypted, stored securely, and used only for petition verification by tribal authorities.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon"><i class="fas fa-gavel"></i></div>
+      <h3>Legal Basis</h3>
+      <p>Conducted pursuant to Article V of the Lumbee Tribe Constitution and applicable tribal ordinance.</p>
+    </div>
+  </div>
+</section>
+{% endblock %}
