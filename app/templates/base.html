@@ -1,64 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>{% block title %}{{ s.petition_title }}{% endblock %} | Lumbee Tribe</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <style>
-    :root {
-      --primary:   {{ s.primary_color }};
-      --secondary: {{ s.secondary_color }};
-      --accent:    {{ s.accent_color }};
-      --overlay-opacity: {{ s.hero_overlay_opacity }};
-    }
-    .site-bg {
-      background-image: url("{{ url_for('static', filename='images/' + s.active_bg) }}");
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ settings.petition_title }}</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body {
+  background-color: {{ settings.background_color or '#8B0000' }};
+  {% if settings.background_image %}
+  background-image: url('/static/uploads/{{ settings.background_image }}');
+  background-size: cover;
+  background-attachment: fixed;
+  {% endif %}
+  color: #fff;
+  min-height: 100vh;
+}
+.card { background: rgba(255,255,255,0.95); color: #333; }
+.navbar { background: rgba(0,0,0,0.5) !important; }
+.btn-tribal { background-color: #8B0000; color: white; border: none; }
+.btn-tribal:hover { background-color: #6b0000; color: white; }
+</style>
 </head>
-<body class="site-bg">
-  <nav class="navbar">
-    <div class="nav-inner">
-      <a href="{{ url_for('main.index') }}" class="brand">
-        <img src="{{ url_for('static', filename='images/' + s.tribe_logo) }}"
-             alt="Logo" class="brand-logo" onerror="this.style.display='none'">
-        <span class="brand-name">Lumbee Tribe</span>
-      </a>
-      <div class="nav-right">
-        <a href="{{ url_for('main.index') }}" class="nav-link"><i class="fas fa-home"></i> Home</a>
-        <a href="{{ url_for('main.sign') }}"  class="nav-cta"><i class="fas fa-pen-nib"></i> Sign Now</a>
-      </div>
+<body>
+<nav class="navbar navbar-dark mb-4">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="{{ url_for('main_bp.index') }}">🪶 {{ settings.petition_title }}</a>
+    <div>
+      <a href="{{ url_for('main_bp.index') }}" class="btn btn-sm btn-outline-light me-2">Home</a>
+      <a href="{{ url_for('main_bp.sign') }}"  class="btn btn-sm btn-light">Sign Petition</a>
     </div>
-  </nav>
+  </div>
+</nav>
+<div class="container pb-5">
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-      <div class="flash-wrap">
-        {% for cat, msg in messages %}
-          <div class="flash flash-{{ cat }}">{{ msg }}</div>
-        {% endfor %}
-      </div>
+      {% for cat, msg in messages %}
+        <div class="alert alert-{{ cat }} alert-dismissible fade show">
+          {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
     {% endif %}
   {% endwith %}
-  <main>{% block content %}{% endblock %}</main>
-  <footer class="footer">
-    <div class="footer-inner">
-      <div class="footer-brand">
-        <img src="{{ url_for('static', filename='images/' + s.tribe_logo) }}"
-             alt="Logo" class="footer-logo" onerror="this.style.display='none'">
-        <span>Lumbee Tribe of North Carolina</span>
-      </div>
-      <div class="footer-links">
-        <p><i class="fas fa-shield-alt"></i> Secured Petition System</p>
-        <p><i class="fas fa-gavel"></i> Pursuant to Lumbee Constitution Art. V</p>
-        <p><small>&copy; 2024 Lumbee Tribe. All rights reserved.</small></p>
-      </div>
-    </div>
-  </footer>
-  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-  {% block scripts %}{% endblock %}
+  {% block content %}{% endblock %}
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

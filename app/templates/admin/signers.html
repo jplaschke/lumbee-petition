@@ -1,0 +1,16 @@
+{% extends 'admin/base_admin.html' %}
+{% block content %}
+<h2>📋 All Signers ({{ signers|length }})</h2>
+<table class="table table-striped table-sm">
+  <thead><tr><th>#</th><th>Name</th><th>Enrollment ID</th><th>Email</th><th>Phone</th><th>IP</th><th>Date</th></tr></thead>
+  <tbody>
+  {% for s in signers %}
+  <tr>
+    <td>{{ loop.index }}</td><td>{{ s.full_name }}</td><td>{{ s.enrollment_id }}</td>
+    <td>{{ s.email }}</td><td>{{ s.phone or '-' }}</td><td>{{ s.ip_address or '-' }}</td>
+    <td>{{ s.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

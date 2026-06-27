@@ -1,0 +1,16 @@
+{% extends 'admin/base_admin.html' %}
+{% block content %}
+<h2>⚙️ Site Settings</h2>
+<div class="card p-4">
+<form method="POST" enctype="multipart/form-data">
+  {{ form.hidden_tag() }}
+  <div class="mb-3">{{ form.petition_title.label(class='form-label fw-bold') }}{{ form.petition_title(class='form-control') }}</div>
+  <div class="mb-3">{{ form.petition_text.label(class='form-label fw-bold') }}{{ form.petition_text(class='form-control', rows=5) }}</div>
+  <div class="mb-3">{{ form.target_signatures.label(class='form-label fw-bold') }}{{ form.target_signatures(class='form-control') }}</div>
+  <div class="mb-3">{{ form.background_color.label(class='form-label fw-bold') }}{{ form.background_color(class='form-control', type='color') }}</div>
+  <div class="mb-3">{{ form.header_image.label(class='form-label fw-bold') }}{{ form.header_image(class='form-control') }}</div>
+  <div class="mb-3">{{ form.background_image.label(class='form-label fw-bold') }}{{ form.background_image(class='form-control') }}</div>
+  <div class="d-grid">{{ form.submit(class='btn btn-danger btn-lg') }}</div>
+</form>
+</div>
+{% endblock %}

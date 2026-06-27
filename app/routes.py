@@ -1,164 +1,135 @@
-from flask import (Blueprint, render_template, request, jsonify,
-                   redirect, url_for, flash, current_app, session)
+from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify, current_app
+from flask_login import login_user, logout_user, login_required
+from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-from datetime import datetime, date
 from app import db
-from app.models import Signer, DuplicateAttempt, AuditLog, SiteSettings
-import os, hashlib, json
+from app.models import Signer, AdminUser, SiteSettings
+from app.forms import SignatureForm, LoginForm, SettingsForm
+from datetime import datetime
+import os
 
-main = Blueprint("main", __name__)
+main_bp  = Blueprint('main_bp',  __name__)
+admin_bp = Blueprint('admin_bp', __name__)
 
-def allowed_file(filename):
-    return ("." in filename and
-            filename.rsplit(".", 1)[1].lower()
-            in current_app.config["ALLOWED_EXTENSIONS"])
+def get_settings():
+    s = SiteSettings.query.first()
+    if not s:
+        s = SiteSettings()
+        db.session.add(s)
+        db.session.commit()
+    return s
 
-def get_ip():
-    xff = request.headers.get("X-Forwarded-For")
-    return xff.split(",")[0].strip() if xff else request.remote_addr
+def save_file(file_obj, folder='uploads'):
+    upload_dir = os.path.join(current_app.root_path, 'static', folder)
+    os.makedirs(upload_dir, exist_ok=True)
+    filename = secure_filename(file_obj.filename)
+    file_obj.save(os.path.join(upload_dir, filename))
+    return filename
 
-def audit(event, enrollment_id, ip, details, severity="INFO"):
-    log = AuditLog(event_type=event, enrollment_id=enrollment_id,
-                   ip_address=ip, details=json.dumps(details), severity=severity)
-    db.session.add(log)
-    db.session.commit()
-
-def site():
-    return {
-        "active_bg":            SiteSettings.get("active_bg",            "bg_default.jpg"),
-        "tribe_logo":           SiteSettings.get("tribe_logo",           "logo.png"),
-        "petition_title":       SiteSettings.get("petition_title",       "Lumbee Tribe Petition"),
-        "petition_description": SiteSettings.get("petition_description", ""),
-        "primary_color":        SiteSettings.get("primary_color",        "#1a237e"),
-        "secondary_color":      SiteSettings.get("secondary_color",      "#b71c1c"),
-        "accent_color":         SiteSettings.get("accent_color",         "#f9a825"),
-        "hero_overlay_opacity": SiteSettings.get("hero_overlay_opacity", "0.65"),
-    }
-
-def progress():
-    count  = Signer.query.count()
-    target = current_app.config["TARGET_SIGNATURES"]
-    pct    = round((count / target) * 100, 1) if target else 0
-    return {"current": count, "target": target,
-            "percent": min(pct, 100), "met": count >= target}
-
-@main.route("/")
+@main_bp.route('/')
 def index():
-    return render_template("index.html", s=site(), p=progress())
+    settings = get_settings()
+    count    = Signer.query.filter_by(verified=True).count()
+    percent  = min(int((count / settings.target_signatures) * 100), 100)
+    return render_template('index.html', settings=settings, count=count, percent=percent)
 
-@main.route("/sign", methods=["GET", "POST"])
+@main_bp.route('/sign', methods=['GET','POST'])
 def sign():
-    s = site(); p = progress()
-    if request.method == "GET":
-        return render_template("sign.html", s=s, p=p, errors=[])
-    ip     = get_ip()
-    name   = request.form.get("full_name",      "").strip()
-    eid    = request.form.get("enrollment_id",  "").strip().upper()
-    email  = request.form.get("email",          "").strip().lower()
-    phone  = request.form.get("phone",          "").strip()
-    expiry = request.form.get("id_card_expiry", "").strip()
-    f      = request.files.get("id_card")
-    errors = []
-    if not all([name, eid, email, expiry, f and f.filename]):
-        errors.append("All required fields must be filled in.")
-    try:
-        exp_date = datetime.strptime(expiry, "%Y-%m-%d").date()
-        if exp_date < date.today():
-            errors.append("Your Member ID card is expired.")
-    except ValueError:
-        errors.append("Invalid expiry date.")
-        exp_date = None
-    if f and not allowed_file(f.filename):
-        errors.append("Invalid file type. Use JPG, PNG, or PDF.")
-    if errors:
-        return render_template("sign.html", s=s, p=p, errors=errors)
-    if Signer.query.filter_by(enrollment_id=eid).first():
-        dup = DuplicateAttempt(
-            attempted_enrollment_id=eid, attempted_name=name,
-            attempted_email=email, ip_address=ip,
-            details=json.dumps({"ts": datetime.utcnow().isoformat()}))
-        db.session.add(dup); db.session.commit()
-        audit("DUPLICATE_ATTEMPT", eid, ip, {"name": name}, "WARNING")
-        errors.append("This Enrollment ID has already signed this petition.")
-        return render_template("sign.html", s=s, p=p, errors=errors)
-    filename = secure_filename(f"{eid}_{f.filename}")
-    f.save(os.path.join(current_app.config["UPLOAD_FOLDER"], filename))
-    sig_hash = hashlib.sha256(
-        f"{name}{eid}{datetime.utcnow().isoformat()}".encode()).hexdigest()
-    signer = Signer(full_name=name, enrollment_id=eid, email=email, phone=phone,
-                    id_card_filename=filename, id_card_expiry=exp_date,
-                    ip_address=ip, signature_hash=sig_hash)
-    db.session.add(signer); db.session.commit()
-    audit("SIGNATURE", eid, ip, {"name": name, "hash": sig_hash})
-    p2 = progress()
-    if p2["met"]:
-        audit("THRESHOLD_REACHED", eid, ip, {"total": p2["current"]})
-    return redirect(url_for("main.success", name=name.split()[0]))
+    settings = get_settings()
+    form     = SignatureForm()
+    if form.validate_on_submit():
+        if Signer.query.filter_by(enrollment_id=form.enrollment_id.data.strip()).first():
+            flash('This Enrollment ID has already signed.', 'danger')
+            return redirect(url_for('main_bp.sign'))
+        id_filename = None
+        if form.id_upload.data and form.id_upload.data.filename:
+            id_filename = save_file(form.id_upload.data)
+        signer = Signer(
+            full_name=form.full_name.data.strip(),
+            enrollment_id=form.enrollment_id.data.strip(),
+            email=form.email.data.strip(),
+            phone=form.phone.data.strip() if form.phone.data else None,
+            ip_address=request.remote_addr,
+            id_filename=id_filename,
+            timestamp=datetime.utcnow(),
+        )
+        signer.set_hash()
+        db.session.add(signer)
+        db.session.commit()
+        flash('Thank you for signing!', 'success')
+        return redirect(url_for('main_bp.thank_you'))
+    return render_template('sign.html', form=form, settings=settings)
 
-@main.route("/success")
-def success():
-    return render_template("success.html", s=site(), p=progress(),
-                           name=request.args.get("name", "Member"))
+@main_bp.route('/thank-you')
+def thank_you():
+    settings = get_settings()
+    count    = Signer.query.filter_by(verified=True).count()
+    return render_template('thank_you.html', settings=settings, count=count)
 
-@main.route("/api/progress")
-def api_progress():
-    return jsonify(progress())
+@main_bp.route('/progress')
+def progress():
+    settings = get_settings()
+    count    = Signer.query.filter_by(verified=True).count()
+    percent  = min(int((count / settings.target_signatures) * 100), 100)
+    return jsonify({'count': count, 'target': settings.target_signatures, 'percent': percent})
 
-def admin_only(f):
-    from functools import wraps
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        if not session.get("admin"):
-            return redirect(url_for("main.login"))
-        return f(*args, **kwargs)
-    return wrapper
-
-@main.route("/admin/login", methods=["GET", "POST"])
+@admin_bp.route('/login', methods=['GET','POST'])
 def login():
-    if request.method == "POST":
-        u  = request.form.get("username", "")
-        pw = request.form.get("password", "")
-        if (u == current_app.config["ADMIN_USERNAME"] and
-                pw == current_app.config["ADMIN_PASSWORD"]):
-            session["admin"] = True
-            return redirect(url_for("main.admin"))
-        flash("Invalid credentials.", "error")
-    return render_template("admin_login.html", s=site())
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = AdminUser.query.filter_by(username=form.username.data).first()
+        if user and check_password_hash(user.password, form.password.data):
+            login_user(user)
+            return redirect(url_for('admin_bp.dashboard'))
+        flash('Invalid credentials.', 'danger')
+    return render_template('admin/login.html', form=form)
 
-@main.route("/admin/logout")
+@admin_bp.route('/logout')
+@login_required
 def logout():
-    session.pop("admin", None)
-    return redirect(url_for("main.index"))
+    logout_user()
+    return redirect(url_for('admin_bp.login'))
 
-@main.route("/admin")
-@admin_only
-def admin():
-    s       = site(); p = progress()
-    signers = Signer.query.order_by(Signer.timestamp.desc()).limit(100).all()
-    dups    = DuplicateAttempt.query.order_by(
-                  DuplicateAttempt.timestamp.desc()).limit(50).all()
-    logs    = AuditLog.query.order_by(AuditLog.timestamp.desc()).limit(100).all()
-    return render_template("admin.html", s=s, p=p,
-                           signers=signers, dups=dups, logs=logs)
+@admin_bp.route('/dashboard')
+@login_required
+def dashboard():
+    settings = get_settings()
+    count    = Signer.query.filter_by(verified=True).count()
+    signers  = Signer.query.order_by(Signer.timestamp.desc()).limit(50).all()
+    return render_template('admin/dashboard.html', settings=settings, count=count, signers=signers)
 
-@main.route("/admin/settings", methods=["POST"])
-@admin_only
-def save_settings():
-    for key in ["petition_title","petition_description","primary_color",
-                "secondary_color","accent_color","hero_overlay_opacity","active_bg"]:
-        val = request.form.get(key)
-        if val is not None:
-            SiteSettings.set(key, val)
-    img_dir = "app/static/images"
-    os.makedirs(img_dir, exist_ok=True)
-    for field, setting in [("tribe_logo","tribe_logo"),("new_bg","active_bg")]:
-        uploaded = request.files.get(field)
-        if uploaded and uploaded.filename and allowed_file(uploaded.filename):
-            fname = secure_filename(uploaded.filename)
-            uploaded.save(os.path.join(img_dir, fname))
-            if field == "tribe_logo":
-                SiteSettings.set("tribe_logo", fname)
-            else:
-                SiteSettings.set("active_bg", fname)
-    flash("Settings saved!", "success")
-    return redirect(url_for("main.admin"))
+@admin_bp.route('/settings', methods=['GET','POST'])
+@login_required
+def settings():
+    s    = get_settings()
+    form = SettingsForm(obj=s)
+    if form.validate_on_submit():
+        s.petition_title    = form.petition_title.data
+        s.petition_text     = form.petition_text.data
+        s.target_signatures = form.target_signatures.data
+        s.background_color  = form.background_color.data
+        if form.header_image.data and form.header_image.data.filename:
+            s.header_image = save_file(form.header_image.data)
+        if form.background_image.data and form.background_image.data.filename:
+            s.background_image = save_file(form.background_image.data)
+        db.session.commit()
+        flash('Settings saved!', 'success')
+        return redirect(url_for('admin_bp.settings'))
+    return render_template('admin/settings.html', form=form, settings=s)
+
+@admin_bp.route('/signers')
+@login_required
+def signers():
+    all_signers = Signer.query.order_by(Signer.timestamp.desc()).all()
+    return render_template('admin/signers.html', signers=all_signers)
+
+@admin_bp.route('/setup')
+def setup():
+    username = os.environ.get('ADMIN_USERNAME', 'admin')
+    password = os.environ.get('ADMIN_PASSWORD', 'changeme123')
+    if not AdminUser.query.filter_by(username=username).first():
+        user = AdminUser(username=username, password=generate_password_hash(password))
+        db.session.add(user)
+        db.session.commit()
+        return f'Admin {username} created!'
+    return 'Admin already exists.'
