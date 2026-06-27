@@ -133,3 +133,9 @@ def setup():
         db.session.commit()
         return f'Admin {username} created!'
     return 'Admin already exists.'
+
+@main.route('/ordinance')
+def view_ordinance():
+    """Render the styled ordinance viewer page"""
+    return render_template('ordinance.html')
+

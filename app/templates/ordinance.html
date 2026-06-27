@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gaming Ordinance | Lumbee Tribe of North Carolina</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Georgia', serif;
+      background: #f5f0e8;
+    }
+
+    /* ── TOP HEADER BAR ── */
+    .ordinance-header {
+      background: #8B0000;
+      color: white;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    .ordinance-header-left h2 {
+      font-size: 1.05rem;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .ordinance-header-left p {
+      font-size: 0.82rem;
+      opacity: 0.85;
+    }
+
+    .ordinance-header-right {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-header {
+      padding: 10px 18px;
+      border-radius: 5px;
+      font-weight: bold;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.2s;
+    }
+
+    .btn-download {
+      background: #DAA520;
+      color: #1a1a1a;
+    }
+
+    .btn-download:hover { background: #c8941a; }
+
+    .btn-close {
+      background: white;
+      color: #8B0000;
+    }
+
+    .btn-close:hover { background: #f0f0f0; }
+
+    /* ── VERIFICATION BANNER ── */
+    .verification-banner {
+      background: #1a1a2e;
+      color: #a0d4a0;
+      padding: 10px 24px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.78rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .verification-banner .hash-label {
+      color: #DAA520;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .verification-banner .hash-value {
+      word-break: break-all;
+      opacity: 0.9;
+    }
+
+    /* ── INFO BAR ── */
+    .ordinance-info-bar {
+      background: #fff8e7;
+      border-bottom: 2px solid #DAA520;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 0.88rem;
+      color: #555;
+    }
+
+    .ordinance-info-bar strong {
+      color: #8B0000;
+    }
+
+    .page-count-badge {
+      background: #8B0000;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+
+    /* ── PDF VIEWER ── */
+    .pdf-container {
+      width: 100%;
+      height: calc(100vh - 155px);
+    }
+
+    .pdf-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    /* ── MOBILE FALLBACK ── */
+    .mobile-view {
+      display: none;
+      padding: 40px 24px;
+      text-align: center;
+    }
+
+    .mobile-view h3 {
+      color: #8B0000;
+      margin-bottom: 12px;
+      font-size: 1.2rem;
+    }
+
+    .mobile-view p {
+      color: #555;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .mobile-view .btn-mobile-download {
+      display: inline-block;
+      background: #8B0000;
+      color: white;
+      padding: 14px 28px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 1rem;
+      margin-top: 20px;
+    }
+
+    .mobile-view .sha-box {
+      background: #1a1a2e;
+      color: #a0d4a0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.72rem;
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 20px;
+      word-break: break-all;
+      text-align: left;
+    }
+
+    @media (max-width: 640px) {
+      .pdf-container { display: none; }
+      .mobile-view   { display: block; }
+      .ordinance-header-left h2 { font-size: 0.95rem; }
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════
+       HEADER BAR
+  ══════════════════════════════════════ -->
+  <div class="ordinance-header">
+    <div class="ordinance-header-left">
+      <h2>🪶 Lumbee Gaming Governance, Transparency &amp; Economic Development Act</h2>
+      <p>Ordinance No. 2026- &nbsp;|&nbsp; Lumbee Tribe of North Carolina &nbsp;|&nbsp; 24 Pages &nbsp;|&nbsp; 52 Sections</p>
+    </div>
+    <div class="ordinance-header-right">
+      <a href="{{ url_for('static', filename='documents/Official_Lumbee_Gaming_Ordinance_Record.pdf') }}"
+         download="Official_Lumbee_Gaming_Ordinance_Record.pdf"
+         class="btn-header btn-download">
+        ⬇️ Download PDF
+      </a>
+      <button class="btn-header btn-close" onclick="window.close()">
+        ✅ Done Reading — Close Tab
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SHA-256 VERIFICATION BANNER
+  ══════════════════════════════════════ -->
+  <div class="verification-banner">
+    <span class="hash-label">🔐 SHA-256 VERIFIED:</span>
+    <span class="hash-value">f9488c4b9f4381867adcf6555cad7fa7e984374ceb2c7f1f2abb3f679578cf82</span>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       INFO BAR
+  ══════════════════════════════════════ -->
+  <div class="ordinance-info-bar">
+    <span>
+      <strong>Authority:</strong> Article V, Constitution of the Lumbee Tribe of North Carolina &nbsp;|&nbsp;
+      <strong>Enacted by:</strong> General Membership Initiative &nbsp;|&nbsp;
+      <strong>Effective:</strong> Upon General Membership Approval
+    </span>
+    <span class="page-count-badge">📄 24 Pages</span>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       PDF VIEWER — DESKTOP
+  ══════════════════════════════════════ -->
+  <div class="pdf-container">
+    <iframe
+      src="{{ url_for('static', filename='documents/Official_Lumbee_Gaming_Ordinance_Record.pdf') }}#toolbar=1&navpanes=0&scrollbar=1&view=FitH"
+      title="Official Lumbee Gaming Ordinance Record">
+    </iframe>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       MOBILE FALLBACK
+  ══════════════════════════════════════ -->
+  <div class="mobile-view">
+    <h3>📱 Please Download to Read on Mobile</h3>
+    <p>
+      Your device may not support inline PDF viewing.<br>
+      Please download the full ordinance and read it before returning to sign the petition.
+    </p>
+    <p>
+      <strong>Ordinance No. 2026-</strong><br>
+      Lumbee Gaming Governance, Transparency &amp; Economic Development Act<br>
+      24 Pages &nbsp;|&nbsp; 52 Sections
+    </p>
+    <a href="{{ url_for('static', filename='documents/Official_Lumbee_Gaming_Ordinance_Record.pdf') }}"
+       download="Official_Lumbee_Gaming_Ordinance_Record.pdf"
+       class="btn-mobile-download">
+      ⬇️ Download Full Ordinance PDF
+    </a>
+    <div class="sha-box">
+      🔐 SHA-256 Document Verification:<br>
+      f9488c4b9f4381867adcf6555cad7fa7e984374ceb2c7f1f2abb3f679578cf82
+    </div>
+  </div>
+
+</body>
+</html>
+
