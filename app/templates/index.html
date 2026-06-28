@@ -255,27 +255,27 @@
 
         <h2 style="color: #222; margin-top: 0; font-size: 1.75rem;">🔐 Admin Login</h2>
         <p style="color: #555; margin-bottom: 20px; font-size: 0.95rem;">Authorized personnel only</p>
+        
+        <form action="{{ url_for('admin_bp.login') }}" method="POST" style="display: flex; flex-direction: column; gap: 15px;">
 
-	<form action="{{ url_for('admin_bp.login') }}" method="POST" style="display: flex; flex-direction: column; gap: 15px;">
-	   
-	    {% if form is defined and form %}
-    		{{ form.hidden_tag() }}
-	    {% endif %}
-	    
-	    <div>
-		<label style="display: block; color: #333; margin-bottom: 5px; font-weight: 500;">Username</label>
-		<input type="text" name="username" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
-	    </div>
-	    
-	    <div>
-		<label style="display: block; color: #333; margin-bottom: 5px; font-weight: 500;">Password</label>
-		<input type="password" name="password" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
-	    </div>
+            {% if form is defined and form %}
+                {{ form.hidden_tag() }}
+            {% endif %}
 
-	    <button type="submit" class="btn btn-primary" style="background-color: #8B0000; border: none; padding: 12px; color: white; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; width: 100%;">
-		Log In
-	    </button>
-	</form>
+            <div>
+                <label style="display: block; color: #333; margin-bottom: 5px; font-weight: 500;">Username</label>
+                <input type="text" name="username" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; color: #000000; background-color: #ffffff;">
+            </div>
+
+            <div>
+                <label style="display: block; color: #333; margin-bottom: 5px; font-weight: 500;">Password</label>
+                <input type="password" name="password" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; color: #000000; background-color: #ffffff;">
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="background-color: #8B0000; border: none; padding: 12px; color: white; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; width: 100%;">
+            Log In
+            </button>
+        </form>
 
         </div>
     </div>
