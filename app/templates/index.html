@@ -214,73 +214,59 @@
 </div>
 <!-- ADMIN LOGIN MODAL -->
 <div id="adminModal" style="
-  display: none;
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.7);
-  z-index: 9999;
-  justify-content: center;
+  display: none; 
+  position: fixed; 
+  top: 0; left: 0; 
+  width: 100%; height: 100%; 
+  background: rgba(0,0,0,0.7); 
+  z-index: 9999; 
+  justify-content: center; 
   align-items: center;
 ">
   <div style="
-    background: white;
-    border-radius: 12px;
-    padding: 40px;
-    width: 100%;
-    max-width: 400px;
-    margin: 20px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-    border-top: 4px solid #8B0000;
+    background: white; 
+    border-radius: 12px; 
+    padding: 40px; 
+    width: 100%; 
+    max-width: 400px; 
+    margin: 20px; 
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5); 
+    border-top: 4px solid #8B0000; 
     position: relative;
   ">
-    <!-- Close Button -->
     <button onclick="closeAdminModal()" style="
-      position: absolute;
-      top: 12px; right: 16px;
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
+      position: absolute; 
+      top: 12px; right: 16px; 
+      background: none; 
+      border: none; 
+      font-size: 1.5rem; 
+      cursor: pointer; 
       color: #888;
     ">✕</button>
 
-    <h2 style="color: #333333; margin-top: 0;">🔐 Admin Login</h2>
-    <p style="color: #666666; margin-bottom: 24px;">Authorized personnel only</p>
+    <h2 style="color: #222222; margin-top: 0; font-size: 1.75rem;">🔐 Admin Login</h2>
+    <p style="color: #555555; margin-bottom: 24px; font-size: 0.95rem;">Authorized personnel only</p>
+
+    <form action="{{ url_for('admin_bp.login') }}" method="POST" style="display: flex; flex-direction: column; gap: 15px;">
+       
+        {% if form is defined and form %}
+            {{ form.hidden_tag() }}
+        {% endif %}
         
-    <div id="adminModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center;">
-        <div style="background: white; border-radius: 12px; padding: 40px; width: 100%; max-width: 400px; margin: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); border-top: 4px solid #8B0000; position: relative;">
-        
-        <button onclick="closeAdminModal()" style="position: absolute; top: 12px; right: 16px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #888;">✕</button>
-
-        <h2 style="color: #222; margin-top: 0; font-size: 1.75rem;">🔐 Admin Login</h2>
-        <p style="color: #555; margin-bottom: 20px; font-size: 0.95rem;">Authorized personnel only</p>
-        
-        <form action="{{ url_for('admin_bp.login') }}" method="POST" style="display: flex; flex-direction: column; gap: 15px;">
-
-            {% if form is defined and form %}
-                {{ form.hidden_tag() }}
-            {% endif %}
-
-            <div>
-                <label style="display: block; color: #333; margin-bottom: 5px; font-weight: 500;">Username</label>
-                <input type="text" name="username" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; color: #000000; background-color: #ffffff;">
-            </div>
-
-            <div>
-                <label style="display: block; color: #333; margin-bottom: 5px; font-weight: 500;">Password</label>
-                <input type="password" name="password" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; color: #000000; background-color: #ffffff;">
-            </div>
-
-            <button type="submit" class="btn btn-primary" style="background-color: #8B0000; border: none; padding: 12px; color: white; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; width: 100%;">
-            Log In
-            </button>
-        </form>
-
+        <div>
+            <label style="display: block; color: #333333; margin-bottom: 5px; font-weight: 500; text-align: left;">Username</label>
+            <input type="text" name="username" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; color: #000000; background-color: #ffffff;">
         </div>
-    </div>
+        
+        <div>
+            <label style="display: block; color: #333333; margin-bottom: 5px; font-weight: 500; text-align: left;">Password</label>
+            <input type="password" name="password" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; color: #000000; background-color: #ffffff;">
+        </div>
 
-
+        <button type="submit" style="background-color: #8B0000; border: none; padding: 12px; color: white; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; width: 100%;">
+            Log In
+        </button>
+    </form>
   </div>
 </div>
 
