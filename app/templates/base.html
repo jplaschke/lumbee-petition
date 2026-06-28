@@ -28,7 +28,8 @@ body {
     <a class="navbar-brand fw-bold" href="{{ url_for('main_bp.index') }}">🪶 {{ settings.petition_title }}</a>
     <div>
       <a href="{{ url_for('main_bp.index') }}" class="btn btn-sm btn-outline-light me-2">Home</a>
-      <a href="{{ url_for('main_bp.sign') }}"  class="btn btn-sm btn-light">Sign Petition</a>
+      <a href="{{ url_for('main_bp.view_ordinance') }}" class="btn btn-sm btn-warning me-2">📜 Ordinance</a>
+      <a href="{{ url_for('main_bp.sign') }}" class="btn btn-sm btn-light">Sign Petition</a>
     </div>
   </div>
 </nav>

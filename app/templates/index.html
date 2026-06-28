@@ -15,7 +15,8 @@
         <div class="progress-bar bg-danger fw-bold" id="prog-bar" style="width:{{ percent }}%;">{{ percent }}%</div>
       </div>
       <p class="text-muted" id="sig-count"><strong>{{ count }}</strong> of <strong>{{ settings.target_signatures }}</strong> signatures</p>
-      <div class="text-center mt-3">
+      <div class="text-center mt-3 d-flex justify-content-center gap-3 flex-wrap">
+        <a href="{{ url_for('main_bp.view_ordinance') }}" class="btn btn-warning btn-lg px-5">📜 Read the Ordinance</a>
         <a href="{{ url_for('main_bp.sign') }}" class="btn btn-tribal btn-lg px-5">✍️ Sign Now</a>
       </div>
     </div>
