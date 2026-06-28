@@ -88,26 +88,28 @@ def login():
     form = LoginForm()
 
     if request.method == 'POST':
-        # 1. Manually feed incoming request data into the WTForm instance
-        # This bridges the gap for data coming from the modal layout!
         form.process(request.form)
+        username = form.username.data or request.form.get('username')
+        password = form.password.data or request.form.get('password')
 
-        # 2. Extract values safely from raw form items
-        username = request.form.get('username')
-        password = request.form.get('password')
+        # 🔍 THE ULTIMATE TRUTH LOG
+        print("--- DISCOVERING ACTUAL DB CONTENT ---", flush=True)
+        any_user = AdminUser.query.first()
+        if any_user:
+            print(f"The actual username stored in your DB is: '{any_user.username}'", flush=True)
+        else:
+            print("The AdminUser table is completely EMPTY!", flush=True)
+        print("-------------------------------------", flush=True)
 
-        # 3. Perform a safe, case-insensitive database lookup
         user = AdminUser.query.filter(func.lower(AdminUser.username) == func.lower(username)).first()
-
+        
         if user and check_password_hash(user.password, password):
             login_user(user)
             return redirect(url_for('admin_bp.dashboard'))
 
-        # If lookups or passwords fail
         flash('Invalid credentials.', 'danger')
         return redirect(request.referrer or url_for('main.index'))
 
-    # Executed strictly on direct GET navigation to /login
     return render_template('admin/login.html', form=form)
 
 
