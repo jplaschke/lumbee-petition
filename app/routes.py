@@ -85,22 +85,28 @@ def view_ordinance():
 @admin_bp.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm() # Keep this so the standalone /login fallback layout functions
-    
+
     if request.method == 'POST':
-        # Safely grab the raw username and password strings from the form
-        username = request.form.get('username')
-        password = request.form.get('password')
-        
+        # 1. Force the form to populate its fields from the request data manually
+        # since we are bypassing the strict .validate_on_submit() method
+        form.process(request.form)
+
+        # 2. Extract credentials safely by checking BOTH WTForms data values 
+        # and raw dictionary values as a fallback
+        username = form.username.data or request.form.get('username')
+        password = form.password.data or request.form.get('password')
+
+        # 3. Perform database lookups using the cleared credentials
         user = AdminUser.query.filter_by(username=username).first()
-        
+
         if user and check_password_hash(user.password, password):
             login_user(user)
             return redirect(url_for('admin_bp.dashboard'))
-        
+
         # If credentials do not match
         flash('Invalid credentials.', 'danger')
         return redirect(request.referrer or url_for('main.index'))
-        
+
     # Standard GET request fallback
     return render_template('admin/login.html', form=form)
 
