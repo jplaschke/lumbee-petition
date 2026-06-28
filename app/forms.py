@@ -8,7 +8,7 @@ class SignatureForm(FlaskForm):
     enrollment_id = StringField('Enrollment ID', validators=[DataRequired(), Length(max=100)])
     email         = StringField('Email', validators=[DataRequired(), Email()])
     phone         = StringField('Phone', validators=[Optional()])
-    id_upload     = FileField('Upload Valid ID', validators=[FileAllowed(['jpg','jpeg','png','pdf'])])
+    id_upload     = FileField('Upload Lumbee Member ID', validators=[FileAllowed(['jpg','jpeg','png','pdf'])])
     submit        = SubmitField('Sign Petition')
 
 class LoginForm(FlaskForm):
