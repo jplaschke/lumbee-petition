@@ -257,8 +257,10 @@
         <p style="color: #555; margin-bottom: 20px; font-size: 0.95rem;">Authorized personnel only</p>
 
 	<form action="{{ url_for('admin_bp.login') }}" method="POST" style="display: flex; flex-direction: column; gap: 15px;">
-	    
-	    {{ form.hidden_tag() }} if form else ''
+	   
+	    {% if form is defined and form %}
+    		{{ form.hidden_tag() }}
+	    {% endif %}
 	    
 	    <div>
 		<label style="display: block; color: #333; margin-bottom: 5px; font-weight: 500;">Username</label>
