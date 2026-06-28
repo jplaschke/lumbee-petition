@@ -1,7 +1,9 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, PasswordField, SubmitField, TextAreaField, IntegerField
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField, IntegerField, BooleanField
 from wtforms.validators import DataRequired, Email, Optional, Length
+# Change your WTForms imports at the top of app/forms.py to this:
+from flask_wtf import FlaskForm
 
 class SignatureForm(FlaskForm):
     full_name     = StringField('Full Legal Name', validators=[DataRequired()])
