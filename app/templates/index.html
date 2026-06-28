@@ -109,25 +109,25 @@
           It's designed to move gaming forward in a way that serves and protects
           every enrolled Lumbee member.
         </p>
-	<blockquote style="
-	  border-left: 4px solid #DAA520;
-	  margin: 16px 0 0 0;
-	  padding: 12px 20px;
-	  background: rgba(218,165,32,0.08);
-	  border-radius: 0 8px 8px 0;
-	">
-	  <p style="
-	    color:#444;
-	    line-height:1.7;
-	    margin:0;
-	    font-style: italic;
-	    font-size: 0.95em;
-	  ">
-	    "The members of the Tribe shall be secure in their persons and property
-	    and such security shall be preserved by the government created by
-	    this Constitution."
-	  </p>
-	</blockquote>
+    <blockquote style="
+      border-left: 4px solid #DAA520;
+      margin: 16px 0 0 0;
+      padding: 12px 20px;
+      background: rgba(218,165,32,0.08);
+      border-radius: 0 8px 8px 0;
+    ">
+      <p style="
+        color:#444;
+        line-height:1.7;
+        margin:0;
+        font-style: italic;
+        font-size: 0.95em;
+      ">
+        "The members of the Tribe shall be secure in their persons and property
+        and such security shall be preserved by the government created by
+        this Constitution."
+      </p>
+    </blockquote>
       </div>
 
       <div style="background: white; border-radius: 12px; padding: 30px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border-top: 4px solid #8B0000;">
@@ -245,12 +245,39 @@
       color: #888;
     ">✕</button>
 
-    <h2>🔐 Admin Login</h2>
-    <p>Authorized personnel only</p>
+    <h2 style="color: #333333; margin-top: 0;">🔐 Admin Login</h2>
+    <p style="color: #666666; margin-bottom: 24px;">Authorized personnel only</p>
+        
+    <div id="adminModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center;">
+        <div style="background: white; border-radius: 12px; padding: 40px; width: 100%; max-width: 400px; margin: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); border-top: 4px solid #8B0000; position: relative;">
+        
+        <button onclick="closeAdminModal()" style="position: absolute; top: 12px; right: 16px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #888;">✕</button>
 
-    <a class="btn btn-primary" href="{{ url_for('admin_bp.login') }}">
-      🔐 Login →
-    </a>
+        <h2 style="color: #222; margin-top: 0; font-size: 1.75rem;">🔐 Admin Login</h2>
+        <p style="color: #555; margin-bottom: 20px; font-size: 0.95rem;">Authorized personnel only</p>
+
+	<form action="{{ url_for('admin_bp.login') }}" method="POST" style="display: flex; flex-direction: column; gap: 15px;">
+	    
+	    {{ form.hidden_tag() }} if form else ''
+	    
+	    <div>
+		<label style="display: block; color: #333; margin-bottom: 5px; font-weight: 500;">Username</label>
+		<input type="text" name="username" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+	    </div>
+	    
+	    <div>
+		<label style="display: block; color: #333; margin-bottom: 5px; font-weight: 500;">Password</label>
+		<input type="password" name="password" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+	    </div>
+
+	    <button type="submit" class="btn btn-primary" style="background-color: #8B0000; border: none; padding: 12px; color: white; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; width: 100%;">
+		Log In
+	    </button>
+	</form>
+
+        </div>
+    </div>
+
 
   </div>
 </div>

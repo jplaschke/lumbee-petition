@@ -82,7 +82,7 @@ def view_ordinance():
     """Render the styled ordinance viewer page"""
     return render_template('ordinance.html')
 
-@admin_bp.route('/login', methods=['GET','POST'])
+@admin_bp.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
@@ -90,8 +90,19 @@ def login():
         if user and check_password_hash(user.password, form.password.data):
             login_user(user)
             return redirect(url_for('admin_bp.dashboard'))
+        
+        # If password check fails
         flash('Invalid credentials.', 'danger')
+        return redirect(request.referrer or url_for('main.index'))
+    
+    # If CSRF validation fails or it's a direct GET request
+    if request.method == 'POST':
+        flash('Login session expired or invalid. Please try again.', 'danger')
+        return redirect(request.referrer or url_for('main.index'))
+        
+    # Fallback only if they navigate directly to /login via browser address bar
     return render_template('admin/login.html', form=form)
+
 
 @admin_bp.route('/logout')
 @login_required
