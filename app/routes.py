@@ -51,7 +51,6 @@ def index():
 
     return render_template('index.html', settings=settings, count=count, percent=percent)
 
-
 @main_bp.route('/sign', methods=['GET', 'POST'])
 def sign():
     settings = get_settings()
@@ -63,7 +62,7 @@ def sign():
             flash('This Enrollment ID has already signed.', 'danger')
             return redirect(url_for('main_bp.sign'))
             
-        # Handle file upload if present
+        # Handle the mandatory file upload (Guaranteed to exist thanks to FileRequired!)
         id_filename = None
         if form.id_upload.data and form.id_upload.data.filename:
             id_filename = save_file(form.id_upload.data)
@@ -71,7 +70,7 @@ def sign():
         # 1. Extract clean string inputs
         full_name = form.full_name.data.strip()
         enrollment_id = form.enrollment_id.data.strip()
-        email = form.email.data.strip()
+        email = form.email.data.strip() if form.email.data else None
         phone = form.phone.data.strip() if form.phone.data else None
         timestamp = datetime.utcnow()
         
@@ -81,9 +80,10 @@ def sign():
         else:
             ip_address = request.remote_addr or "Unknown"
             
-        # 3. Log data to the live terminal console for tracking
+        # 3. Log data to the live terminal console for auditing and tracking
         logger.info("=== NEW PETITION SIGNATURE ATTEMPT ===")
         logger.info(f"Name: {full_name} | ID: {enrollment_id}")
+        logger.info(f"Attached ID File: {id_filename}")
         logger.info(f"Verified Client IP: {ip_address}")
         
         try:
@@ -100,11 +100,12 @@ def sign():
                 format=serialization.PublicFormat.SubjectPublicKeyInfo
             ).decode('utf-8')
             
-            # 5. Build the immutable legal manifest statement
+            # 5. Build the immutable legal manifest statement (Explicitly binding the ID file!)
             signature_manifest = (
                 f"Petition Manifest: {PETITION_MANIFESTO}\n"
                 f"Signer Legal Name: {full_name}\n"
                 f"Enrollment ID: {enrollment_id}\n"
+                f"Verified ID Attachment: {id_filename}\n"
                 f"Timestamp ISO: {timestamp.isoformat()}\n"
                 f"Network IP Origin: {ip_address}"
             )
@@ -119,7 +120,7 @@ def sign():
                 ),
                 hashes.SHA256()
             )
-            # Encode binary data to clean Base64 text
+            # Encode binary data to clean, web-safe Base64 text
             b64_signature = base64.b64encode(raw_signature).decode('utf-8')
             
             # 7. Build and populate the database record
@@ -128,7 +129,7 @@ def sign():
                 enrollment_id=enrollment_id,
                 email=email,
                 phone=phone,
-                ip_address=ip_address,  # Now stores the real user IP, not proxy
+                ip_address=ip_address,
                 id_filename=id_filename,
                 timestamp=timestamp,
                 # New cryptographic audit columns

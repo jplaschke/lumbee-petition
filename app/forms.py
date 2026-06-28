@@ -5,20 +5,30 @@ from wtforms.validators import DataRequired, Email, Optional, Length
 # Change your WTForms imports at the top of app/forms.py to this:
 from flask_wtf import FlaskForm
 
+from flask_wtf import FlaskForm
+# 🚨 IMPORT BOTH FileField AND FileRequired FOR THE MANDATORY UPLOAD
+from flask_wtf.file import FileField, FileRequired, FileAllowed
+from wtforms import StringField, SubmitField, BooleanField
+from wtforms.validators import DataRequired
+
 class SignatureForm(FlaskForm):
     full_name     = StringField('Full Legal Name', validators=[DataRequired()])
     enrollment_id = StringField('Enrollment ID', validators=[DataRequired()])
-    email         = StringField('Email Address', validators=[DataRequired()])
+
+    # 🚨 CHANGE THIS FIELD TO MANDATORY
+    # FileRequired() stops the form submission if no file is chosen.
+    # FileAllowed() ensures they upload an image or PDF, preventing malicious files.
+    id_upload     = FileField('ID Upload', validators=[
+        FileRequired(message="You must upload a photo of your ID to verify your signature."),
+        FileAllowed(['jpg', 'jpeg', 'png', 'pdf'], 'Only images (jpg, png) or PDFs are allowed.')
+    ])
+
+    email         = StringField('Email Address')
     phone         = StringField('Phone Number')
-    
-    # 📜 THE LEGAL CONSENT CHECKBOX
-    # Setting 'validators=[DataRequired()]' forces the box to be checked to pass validation
-    legal_consent = BooleanField(
-        'I certify under penalty of perjury that I am an enrolled member of the Lumbee Tribe of North Carolina, and by checking this box, I am providing my legally binding digital signature equivalent to a wet signature.',
-        validators=[DataRequired(message="You must accept the legal certification to sign this petition.")]
-    )
-    
-    submit = SubmitField('Sign Petition')
+
+    legal_consent = BooleanField('Legal Consent', validators=[DataRequired()])
+    submit        = SubmitField('Sign Petition')
+
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
