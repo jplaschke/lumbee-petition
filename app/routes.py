@@ -28,9 +28,6 @@ def save_file(file_obj, folder='uploads'):
 
 @main_bp.route('/')
 def index():
-    settings = get_settings()
-    count    = Signer.query.filter_by(verified=True).count()
-    percent  = min(int((count / settings.target_signatures) * 100), 100)
     return render_template('index.html', settings=settings, count=count, percent=percent)
 
 @main_bp.route('/sign', methods=['GET','POST'])

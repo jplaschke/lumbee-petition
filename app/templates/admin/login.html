@@ -8,16 +8,27 @@
   <h3>🪶 Admin Login</h3>
 
   {% with messages = get_flashed_messages(with_categories=true) %}
-    {% for cat,msg in messages %}
-      {{ msg }}
+    {% for cat, msg in messages %}
+      <div>{{ msg }}</div>
     {% endfor %}
   {% endwith %}
 
   <form method="POST" action="{{ url_for('admin_bp.login') }}">
     {{ form.hidden_tag() }}
-    {{ form.username.label }} {{ form.username }}
-    {{ form.password.label }} {{ form.password }}
-    {{ form.submit() }}
+
+    <div>
+      {{ form.username.label }}
+      {{ form.username }}
+    </div>
+
+    <div>
+      {{ form.password.label }}
+      {{ form.password }}
+    </div>
+
+    <div>
+      {{ form.submit }}   <!-- ✅ not submit() -->
+    </div>
   </form>
 </body>
 </html>
