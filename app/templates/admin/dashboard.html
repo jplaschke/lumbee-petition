@@ -4,7 +4,7 @@
 <div class="row mb-4">
   <div class="col-md-4"><div class="card text-white bg-danger p-3 text-center"><h3>{{ count }}</h3><p>Total Signatures</p></div></div>
   <div class="col-md-4"><div class="card text-white bg-dark p-3 text-center"><h3>{{ settings.target_signatures }}</h3><p>Target</p></div></div>
-  <div class="col-md-4"><div class="card text-white bg-secondary p-3 text-center"><h3>{{ ((count / settings.target_signatures)*100)|int }}%</h3><p>Progress</p></div></div>
+  <div class="col-md-4"><div class="card text-white bg-secondary p-3 text-center"><h3>{{ ((count / settings.target_signatures or 1)*100)|int }}%</h3><p>Progress</p></div></div>
 </div>
 <h5>Recent Signatures</h5>
 <table class="table table-striped table-sm">

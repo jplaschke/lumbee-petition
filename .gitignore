@@ -1,0 +1,18 @@
+# .gitignore
+
+# Admin setup — NEVER push this
+admin_setup.py
+
+# Other sensitive files
+.env
+*.env
+venv/
+__pycache__/
+instance/
+*.db
+*.sqlite
+*.pem
+*.key
+*.crt
+ssl/
+
