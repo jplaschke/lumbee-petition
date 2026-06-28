@@ -247,22 +247,18 @@
     <h2 style="color: #222222; margin-top: 0; font-size: 1.75rem;">🔐 Admin Login</h2>
     <p style="color: #555555; margin-bottom: 24px; font-size: 0.95rem;">Authorized personnel only</p>
 
-    <form action="{{ url_for('admin_bp.login') }}" method="POST" style="display: flex; flex-direction: column; gap: 15px;">
-        
-        <div>
-            <label style="display: block; color: #333333; margin-bottom: 5px; font-weight: 500; text-align: left;">Username</label>
-            <input type="text" name="username" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; color: #000000; background-color: #ffffff;">
-        </div>
-        
-        <div>
-            <label style="display: block; color: #333333; margin-bottom: 5px; font-weight: 500; text-align: left;">Password</label>
-            <input type="password" name="password" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; color: #000000; background-color: #ffffff;">
-        </div>
+	<form action="{{ url_for('admin_bp.login') }}" method="POST" style="display: flex; flex-direction: column; gap: 15px;">
+	    <div>
+		<label style="display: block; color: #333333; margin-bottom: 5px; font-weight: 500; text-align: left;">Username</label>
+		<input type="text" name="username" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; color: #000000; background-color: #ffffff;">
+	    </div>
+	    <div>
+		<label style="display: block; color: #333333; margin-bottom: 5px; font-weight: 500; text-align: left;">Password</label>
+		<input type="password" name="password" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; color: #000000; background-color: #ffffff;">
+	    </div>
+	    <button type="submit" style="background-color: #8B0000; border: none; padding: 12px; color: white; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; width: 100%;">Log In</button>
+	</form>
 
-        <button type="submit" style="background-color: #8B0000; border: none; padding: 12px; color: white; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; width: 100%;">
-            Log In
-        </button>
-    </form>
   </div>
 </div>
 

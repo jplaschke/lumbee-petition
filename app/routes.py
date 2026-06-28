@@ -7,6 +7,7 @@ from app.models import Signer, AdminUser, SiteSettings
 from app.forms import SignatureForm, LoginForm, SettingsForm
 from datetime import datetime
 import os
+from sqlalchemy import func
 
 main_bp  = Blueprint('main_bp',  __name__)
 admin_bp = Blueprint('admin_bp', __name__)
@@ -87,34 +88,26 @@ def login():
     form = LoginForm()
 
     if request.method == 'POST':
+        # 1. Manually feed incoming request data into the WTForm instance
+        # This bridges the gap for data coming from the modal layout!
         form.process(request.form)
 
+        # 2. Extract values safely from either WTForm attributes or raw form items
         username = form.username.data or request.form.get('username')
         password = form.password.data or request.form.get('password')
 
-        # 🔍 CRITICAL DEBUG LOGS 
-        print(f"--- DEBUG ADMIN LOGIN STAGE ---", flush=True)
-        print(f"Incoming Form Username: '{username}'", flush=True)
-        print(f"Incoming Form Password: '{password}'", flush=True)
-
-        user = AdminUser.query.filter_by(username=username).first()
-        
-        if user:
-            print(f"Database User Found: '{user.username}'", flush=True)
-            # Test match condition explicitly
-            password_match = check_password_hash(user.password, password)
-            print(f"Password Check Match Status: {password_match}", flush=True)
-        else:
-            print(f"Database User Found: NONE", flush=True)
-        print(f"--------------------------------", flush=True)
+        # 3. Perform a safe, case-insensitive database lookup
+        user = AdminUser.query.filter(func.lower(AdminUser.username) == func.lower(username)).first()
 
         if user and check_password_hash(user.password, password):
             login_user(user)
             return redirect(url_for('admin_bp.dashboard'))
 
+        # If lookups or passwords fail
         flash('Invalid credentials.', 'danger')
         return redirect(request.referrer or url_for('main.index'))
 
+    # Executed strictly on direct GET navigation to /login
     return render_template('admin/login.html', form=form)
 
 
