@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from app import db
 from app.models import Signer, AdminUser, SiteSettings
-from app.forms impor SignatureForm, LoginForm, SettingsForm
+from app.forms import SignatureForm, LoginForm, SettingsForm
 from datetime import datetime
 import os
 from sqlalchemy import func
