@@ -84,23 +84,24 @@ def view_ordinance():
 
 @admin_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        user = AdminUser.query.filter_by(username=form.username.data).first()
-        if user and check_password_hash(user.password, form.password.data):
+    form = LoginForm() # Keep this so the standalone /login fallback layout functions
+    
+    if request.method == 'POST':
+        # Safely grab the raw username and password strings from the form
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        user = AdminUser.query.filter_by(username=username).first()
+        
+        if user and check_password_hash(user.password, password):
             login_user(user)
             return redirect(url_for('admin_bp.dashboard'))
         
-        # If password check fails
+        # If credentials do not match
         flash('Invalid credentials.', 'danger')
         return redirect(request.referrer or url_for('main.index'))
-    
-    # If CSRF validation fails or it's a direct GET request
-    if request.method == 'POST':
-        flash('Login session expired or invalid. Please try again.', 'danger')
-        return redirect(request.referrer or url_for('main.index'))
         
-    # Fallback only if they navigate directly to /login via browser address bar
+    # Standard GET request fallback
     return render_template('admin/login.html', form=form)
 
 
