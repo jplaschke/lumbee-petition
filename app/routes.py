@@ -92,9 +92,9 @@ def login():
         # This bridges the gap for data coming from the modal layout!
         form.process(request.form)
 
-        # 2. Extract values safely from either WTForm attributes or raw form items
-        username = form.username.data or request.form.get('username')
-        password = form.password.data or request.form.get('password')
+        # 2. Extract values safely from raw form items
+        username = request.form.get('username')
+        password = request.form.get('password')
 
         # 3. Perform a safe, case-insensitive database lookup
         user = AdminUser.query.filter(func.lower(AdminUser.username) == func.lower(username)).first()
