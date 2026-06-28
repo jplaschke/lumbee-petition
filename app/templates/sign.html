@@ -1,33 +1,64 @@
-<form method="POST" action="{{ url_for('main_bp.sign') }}" enctype="multipart/form-data">
-    {{ form.hidden_tag() }}
+{% extends "base.html" %}
 
-    <div class="form-group">
-        {{ form.full_name.label }}
-        {{ form.full_name(class="form-control") }}
+{% block content %}
+<div style="max-width: 600px; margin: 60px auto; padding: 30px; font-family: system-ui, sans-serif; background: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border-top: 6px solid #8B0000;">
+    
+    <div style="text-align: center; margin-bottom: 25px;">
+        <p style="font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; color: #DAA520; margin-bottom: 5px; font-weight: 600;">Lumbee Tribe of North Carolina</p>
+        <h2 style="color: #8B0000; margin: 0; font-size: 1.8rem; font-weight: 800;">✍️ Sign Official Petition</h2>
     </div>
     
-    <div class="form-group">
-        {{ form.enrollment_id.label }}
-        {{ form.enrollment_id(class="form-control") }}
-    </div>
+    <form method="POST" action="{{ url_for('main_bp.sign') }}" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 18px;">
+        {{ form.hidden_tag() }}
 
-    <div class="form-check" style="margin: 20px 0; padding: 15px; background-color: #f9f9f9; border-left: 4px solid #8B0000; border-radius: 4px;">
-        <div style="display: flex; align-items: flex-start; gap: 10px;">
-            {{ form.legal_consent(class="form-check-input", id="legal_consent", style="margin-top: 5px; scale: 1.2;") }}
-            <label class="form-check-label" for="legal_consent" style="font-size: 0.95em; color: #333; line-height: 1.4; font-weight: 500;">
-                I certify under penalty of perjury that I am a registered member of the Lumbee Tribe of North Carolina, and by checking this box and typing my name above, I am providing my legally binding digital signature equivalent to a physical wet signature for this petition to the Lumbee Election Board.
-            </label>
+        <!-- Full Legal Name -->
+        <div>
+            <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #333333; font-size: 0.95rem;">Full Legal Name</label>
+            {{ form.full_name(style="width: 100%; padding: 12px; border: 1px solid #cccccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; background-color: #ffffff; color: #000000;") }}
+            {% if form.full_name.errors %}
+                {% for error in form.full_name.errors %}
+                    <div style="color: #d9534f; font-size: 0.85rem; margin-top: 4px; font-weight: bold;">{{ error }}</div>
+                {% endfor %}
+            {% endif %}
         </div>
-        {# Display validation errors if they click submit without checking it #}
-        {% if form.legal_consent.errors %}
-            {% for error in form.legal_consent.errors %}
-                <div class="text-danger" style="margin-top: 5px; font-weight: bold; font-size: 0.85em;">{{ error }}</div>
-            {% endfor %}
-        {% endif %}
-    </div>
+        
+        <!-- Enrollment ID -->
+        <div>
+            <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #333333; font-size: 0.95rem;">Enrollment ID</label>
+            {{ form.enrollment_id(style="width: 100%; padding: 12px; border: 1px solid #cccccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; background-color: #ffffff; color: #000000;") }}
+            {% if form.enrollment_id.errors %}
+                {% for error in form.enrollment_id.errors %}
+                    <div style="color: #d9534f; font-size: 0.85rem; margin-top: 4px; font-weight: bold;">{{ error }}</div>
+                {% endfor %}
+            {% endif %}
+        </div>
 
-    <div class="form-group">
-        {{ form.submit(class="btn btn-primary", style="width: 100%; font-weight: bold;") }}
-    </div>
-</form>
+        <!-- Optional ID Upload -->
+        <div>
+            <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #333333; font-size: 0.95rem;">ID Upload (Optional)</label>
+            {{ form.id_upload(style="width: 100%; font-size: 15px; color: #555555;") }}
+        </div>
+
+        <!-- Legal Consent Checkbox Card -->
+        <div style="padding: 18px; background-color: #fdf6f6; border-left: 4px solid #8B0000; border-radius: 6px; margin-top: 10px;">
+            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                {{ form.legal_consent(id="legal_consent", style="margin-top: 4px; transform: scale(1.3); cursor: pointer;") }}
+                <label for="legal_consent" style="font-size: 0.9rem; color: #222222; line-height: 1.5; cursor: pointer; user-select: none; font-weight: 500;">
+                    I certify under penalty of perjury that I am a registered member of the Lumbee Tribe of North Carolina, and by checking this box and typing my name above, I am providing my legally binding digital signature equivalent to a physical wet signature for this petition to the Lumbee Election Board.
+                </label>
+            </div>
+            {% if form.legal_consent.errors %}
+                {% for error in form.legal_consent.errors %}
+                    <div style="color: #d9534f; margin-top: 8px; font-weight: bold; font-size: 0.85em;">{{ error }}</div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <!-- Submit Button Matches Theme CTA -->
+        <div style="margin-top: 10px;">
+            {{ form.submit(style="width: 100%; padding: 14px; background: linear-gradient(135deg, #8B0000, #6B0000); color: white; border: none; border-radius: 50px; font-weight: 700; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(139,0,0,0.2); transition: transform 0.2s;") }}
+        </div>
+    </form>
+</div>
+{% endblock %}
 
