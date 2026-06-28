@@ -1,34 +1,197 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-lg-8">
-    {% if settings.header_image %}
-    <img src="/static/uploads/{{ settings.header_image }}" class="img-fluid rounded mb-4 w-100" style="max-height:300px;object-fit:cover;">
-    {% endif %}
-    <div class="card shadow p-4 mb-4">
-      <h1 class="text-center fw-bold" style="color:#8B0000;">🪶 {{ settings.petition_title }}</h1>
-      <hr>
-      <p class="lead">{{ settings.petition_text }}</p>
-      <hr>
-      <h5>📊 Signature Progress</h5>
-      <div class="progress mb-2" style="height:30px;">
-        <div class="progress-bar bg-danger fw-bold" id="prog-bar" style="width:{{ percent }}%;">{{ percent }}%</div>
-      </div>
-      <p class="text-muted" id="sig-count"><strong>{{ count }}</strong> of <strong>{{ settings.target_signatures }}</strong> signatures</p>
-      <div class="text-center mt-3 d-flex justify-content-center gap-3 flex-wrap">
-        <a href="{{ url_for('main_bp.view_ordinance') }}" class="btn btn-warning btn-lg px-5">📜 Read the Ordinance</a>
-        <a href="{{ url_for('main_bp.sign') }}" class="btn btn-tribal btn-lg px-5">✍️ Sign Now</a>
-      </div>
+
+<!-- HERO SECTION -->
+<div style="
+  background: linear-gradient(135deg, #6B0000 0%, #8B0000 50%, #A00000 100%);
+  color: white;
+  padding: 80px 20px 60px;
+  text-align: center;
+  border-bottom: 4px solid #DAA520;
+">
+  <div style="max-width: 800px; margin: 0 auto;">
+    <p style="
+      font-size: 1.1rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #DAA520;
+      margin-bottom: 16px;
+      font-weight: 600;
+    ">Lumbee Tribe of North Carolina</p>
+
+    <h1 style="
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      margin: 0 0 20px;
+      line-height: 1.2;
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.4);
+    ">🪶 Petition for Gaming Ordinance</h1>
+
+    <p style="
+      font-size: clamp(1.2rem, 3vw, 1.8rem);
+      font-style: italic;
+      color: #FFD700;
+      margin: 0 0 30px;
+      font-weight: 500;
+    ">"Voted yes. Voted no. This is better."</p>
+
+    <div style="
+      width: 80px;
+      height: 3px;
+      background: #DAA520;
+      margin: 0 auto 30px;
+    "></div>
+
+    <p style="
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: rgba(255,255,255,0.9);
+      max-width: 650px;
+      margin: 0 auto 40px;
+    ">
+      Under <strong>Title V of the Lumbee Constitution</strong>, our tribe has the authority
+      to establish gaming operations for the benefit of our people. By signing this petition,
+      you are calling on the <strong>Tribal Council</strong> to consider a Gaming Ordinance
+      amendment — a path forward that unites our community and moves gaming into reality.
+    </p>
+
+    <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+      <a href="/sign" style="
+        background: #DAA520;
+        color: #1a0000;
+        padding: 16px 40px;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        text-decoration: none;
+        box-shadow: 0 4px 20px rgba(218,165,32,0.4);
+        transition: transform 0.2s;
+      ">✍️ Sign the Petition</a>
+
+      <a href="/ordinance" style="
+        background: transparent;
+        color: white;
+        padding: 16px 40px;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        text-decoration: none;
+        border: 2px solid #DAA520;
+      ">📋 Read the Ordinance</a>
     </div>
   </div>
 </div>
-<script>
-setInterval(function(){
-  fetch('/progress').then(r=>r.json()).then(d=>{
-    document.getElementById('prog-bar').style.width=d.percent+'%';
-    document.getElementById('prog-bar').innerText=d.percent+'%';
-    document.getElementById('sig-count').innerHTML='<strong>'+d.count+'</strong> of <strong>'+d.target+'</strong> signatures';
-  });
-},15000);
-</script>
+
+<!-- WHY THIS MATTERS SECTION -->
+<div style="background: #fff8f0; padding: 60px 20px;">
+  <div style="max-width: 900px; margin: 0 auto;">
+    <h2 style="text-align:center; color:#8B0000; font-size:2rem; margin-bottom: 40px;">
+      Why This Petition Matters
+    </h2>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 30px;">
+
+      <div style="background: white; border-radius: 12px; padding: 30px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border-top: 4px solid #8B0000;">
+        <div style="font-size: 2.5rem; margin-bottom: 12px;">📜</div>
+        <h3 style="color:#8B0000; margin: 0 0 10px;">Constitutional Authority</h3>
+        <p style="color:#555; line-height:1.7; margin:0;">
+          Title V of the Lumbee Constitution grants the Tribal Council the power to enact
+          gaming ordinances. This petition invokes that right on behalf of enrolled members.
+        </p>
+      </div>
+
+      <div style="background: white; border-radius: 12px; padding: 30px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border-top: 4px solid #DAA520;">
+        <div style="font-size: 2.5rem; margin-bottom: 12px;">🤝</div>
+        <h3 style="color:#8B0000; margin: 0 0 10px;">A Path Forward</h3>
+        <p style="color:#555; line-height:1.7; margin:0;">
+          Whether you voted yes or no before — this ordinance is a better solution.
+          It's designed to move gaming forward in a way that serves and protects
+          every enrolled Lumbee member.
+        </p>
+      </div>
+
+      <div style="background: white; border-radius: 12px; padding: 30px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border-top: 4px solid #8B0000;">
+        <div style="font-size: 2.5rem; margin-bottom: 12px;">🗳️</div>
+        <h3 style="color:#8B0000; margin: 0 0 10px;">Your Voice Counts</h3>
+        <p style="color:#555; line-height:1.7; margin:0;">
+          The Tribal Council must hear from enrolled members. Your signature sends
+          a clear message: the people are ready for gaming to move forward — the right way.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- SIGNATURE PROGRESS SECTION -->
+<div style="background: white; padding: 60px 20px;">
+  <div style="max-width: 700px; margin: 0 auto; text-align: center;">
+
+    <h2 style="color:#8B0000; font-size:1.8rem; margin-bottom: 10px;">
+      📊 Signature Progress
+    </h2>
+    <p style="color:#777; margin-bottom: 30px;">
+      We need <strong>{{ settings.target_signatures }}</strong> enrolled members to sign.
+    </p>
+
+    <!-- Progress Bar -->
+    <div style="background:#f0e8e8; border-radius:50px; height:28px; overflow:hidden; margin-bottom:12px; box-shadow: inset 0 2px 6px rgba(0,0,0,0.1);">
+      <div style="
+        background: linear-gradient(90deg, #8B0000, #DAA520);
+        height: 100%;
+        width: {{ [(count / settings.target_signatures * 100), 100] | min }}%;
+        border-radius: 50px;
+        transition: width 1s ease;
+        min-width: {{ '8px' if count > 0 else '0' }};
+      "></div>
+    </div>
+
+    <p style="font-size:1.2rem; color:#333; margin-bottom:40px;">
+      <strong style="color:#8B0000; font-size:1.5rem;">{{ count }}</strong>
+      of <strong>{{ settings.target_signatures }}</strong> signatures
+    </p>
+
+    <a href="/sign" style="
+      display: inline-block;
+      background: linear-gradient(135deg, #8B0000, #6B0000);
+      color: white;
+      padding: 18px 60px;
+      border-radius: 50px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 6px 24px rgba(139,0,0,0.3);
+    ">✍️ Add Your Signature</a>
+
+  </div>
+</div>
+
+<!-- BOTTOM CTA BANNER -->
+<div style="
+  background: linear-gradient(135deg, #1a0000, #3a0000);
+  color: white;
+  padding: 50px 20px;
+  text-align: center;
+  border-top: 4px solid #DAA520;
+">
+  <h2 style="font-size:1.8rem; margin-bottom:12px;">Ready to make history?</h2>
+  <p style="color:rgba(255,255,255,0.8); font-size:1.1rem; margin-bottom:30px; font-style:italic;">
+    "Voted yes. Voted no. This is better."
+  </p>
+  <div style="display:flex; gap:16px; justify-content:center; flex-wrap:wrap;">
+    <a href="/sign" style="
+      background:#DAA520; color:#1a0000;
+      padding:14px 36px; border-radius:50px;
+      font-weight:700; text-decoration:none; font-size:1rem;
+    ">✍️ Sign Now</a>
+    <a href="/ordinance" style="
+      background:transparent; color:white;
+      padding:14px 36px; border-radius:50px;
+      font-weight:700; text-decoration:none; font-size:1rem;
+      border: 2px solid #DAA520;
+    ">📋 Read the Ordinance</a>
+  </div>
+</div>
+
 {% endblock %}
