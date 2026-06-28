@@ -4,12 +4,19 @@ from wtforms import StringField, PasswordField, SubmitField, TextAreaField, Inte
 from wtforms.validators import DataRequired, Email, Optional, Length
 
 class SignatureForm(FlaskForm):
-    full_name     = StringField('Full Name', validators=[DataRequired(), Length(max=200)])
-    enrollment_id = StringField('Enrollment ID', validators=[DataRequired(), Length(max=100)])
-    email         = StringField('Email', validators=[DataRequired(), Email()])
-    phone         = StringField('Phone', validators=[Optional()])
-    id_upload     = FileField('Upload Lumbee Member ID', validators=[FileAllowed(['jpg','jpeg','png','pdf'])])
-    submit        = SubmitField('Sign Petition')
+    full_name     = StringField('Full Legal Name', validators=[DataRequired()])
+    enrollment_id = StringField('Enrollment ID', validators=[DataRequired()])
+    email         = StringField('Email Address', validators=[DataRequired()])
+    phone         = StringField('Phone Number')
+    
+    # 📜 THE LEGAL CONSENT CHECKBOX
+    # Setting 'validators=[DataRequired()]' forces the box to be checked to pass validation
+    legal_consent = BooleanField(
+        'I certify under penalty of perjury that I am an enrolled member of the Lumbee Tribe of North Carolina, and by checking this box, I am providing my legally binding digital signature equivalent to a wet signature.',
+        validators=[DataRequired(message="You must accept the legal certification to sign this petition.")]
+    )
+    
+    submit = SubmitField('Sign Petition')
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])

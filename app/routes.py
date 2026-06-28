@@ -4,10 +4,23 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from app import db
 from app.models import Signer, AdminUser, SiteSettings
-from app.forms import SignatureForm, LoginForm, SettingsForm
+from app.forms impor SignatureForm, LoginForm, SettingsForm
 from datetime import datetime
 import os
 from sqlalchemy import func
+import base64
+import logging
+# Assuming SignatureForm is imported from your forms module
+
+# Cryptography primitives
+from cryptography.hazmat.primitives.asymmetric import rsa, padding
+from cryptography.hazmat.primitives import hashes, serialization
+
+# Configure logging to output to Render console
+logger = logging.getLogger(__name__)
+
+# The static, formal text of the petition the board evaluates
+PETITION_MANIFESTO = "Official Petition to the Lumbee Election Board regarding..."
 
 main_bp  = Blueprint('main_bp',  __name__)
 admin_bp = Blueprint('admin_bp', __name__)
@@ -38,32 +51,108 @@ def index():
 
     return render_template('index.html', settings=settings, count=count, percent=percent)
 
-@main_bp.route('/sign', methods=['GET','POST'])
+
+@main_bp.route('/sign', methods=['GET', 'POST'])
 def sign():
     settings = get_settings()
-    form     = SignatureForm()
+    form = SignatureForm()
+    
     if form.validate_on_submit():
+        # Check for duplicate signatures
         if Signer.query.filter_by(enrollment_id=form.enrollment_id.data.strip()).first():
             flash('This Enrollment ID has already signed.', 'danger')
             return redirect(url_for('main_bp.sign'))
+            
+        # Handle file upload if present
         id_filename = None
         if form.id_upload.data and form.id_upload.data.filename:
             id_filename = save_file(form.id_upload.data)
-        signer = Signer(
-            full_name=form.full_name.data.strip(),
-            enrollment_id=form.enrollment_id.data.strip(),
-            email=form.email.data.strip(),
-            phone=form.phone.data.strip() if form.phone.data else None,
-            ip_address=request.remote_addr,
-            id_filename=id_filename,
-            timestamp=datetime.utcnow(),
-        )
-        signer.set_hash()
-        db.session.add(signer)
-        db.session.commit()
-        flash('Thank you for signing!', 'success')
-        return redirect(url_for('main_bp.thank_you'))
+            
+        # 1. Extract clean string inputs
+        full_name = form.full_name.data.strip()
+        enrollment_id = form.enrollment_id.data.strip()
+        email = form.email.data.strip()
+        phone = form.phone.data.strip() if form.phone.data else None
+        timestamp = datetime.utcnow()
+        
+        # 2. Extract proxy-safe Client IP on Render
+        if request.headers.getlist("X-Forwarded-For"):
+            ip_address = request.headers.getlist("X-Forwarded-For")[0].split(',')[0].strip()
+        else:
+            ip_address = request.remote_addr or "Unknown"
+            
+        # 3. Log data to the live terminal console for tracking
+        logger.info("=== NEW PETITION SIGNATURE ATTEMPT ===")
+        logger.info(f"Name: {full_name} | ID: {enrollment_id}")
+        logger.info(f"Verified Client IP: {ip_address}")
+        
+        try:
+            # 4. Generate unique RSA keys for asymmetric validation
+            private_key = rsa.generate_private_key(
+                public_exponent=65537,
+                key_size=2048
+            )
+            public_key = private_key.public_key()
+            
+            # Serialize Public Key to PEM format text for DB storage
+            pem_public_key = public_key.public_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PublicFormat.SubjectPublicKeyInfo
+            ).decode('utf-8')
+            
+            # 5. Build the immutable legal manifest statement
+            signature_manifest = (
+                f"Petition Manifest: {PETITION_MANIFESTO}\n"
+                f"Signer Legal Name: {full_name}\n"
+                f"Enrollment ID: {enrollment_id}\n"
+                f"Timestamp ISO: {timestamp.isoformat()}\n"
+                f"Network IP Origin: {ip_address}"
+            )
+            
+            # 6. Cryptographically seal the manifest block using the Private Key
+            message_bytes = signature_manifest.encode('utf-8')
+            raw_signature = private_key.sign(
+                message_bytes,
+                padding.PSS(
+                    mgf=padding.MGF1(hashes.SHA256()),
+                    salt_length=padding.PSS.MAX_LENGTH
+                ),
+                hashes.SHA256()
+            )
+            # Encode binary data to clean Base64 text
+            b64_signature = base64.b64encode(raw_signature).decode('utf-8')
+            
+            # 7. Build and populate the database record
+            signer = Signer(
+                full_name=full_name,
+                enrollment_id=enrollment_id,
+                email=email,
+                phone=phone,
+                ip_address=ip_address,  # Now stores the real user IP, not proxy
+                id_filename=id_filename,
+                timestamp=timestamp,
+                # New cryptographic audit columns
+                digital_signature=b64_signature,
+                public_key=pem_public_key,
+                manifest_data=signature_manifest
+            )
+            
+            signer.set_hash()  # Runs your existing application specific hashing
+            db.session.add(signer)
+            db.session.commit()
+            
+            logger.info(f"=== SECURE AUDIT SIGNATURE RECODED FOR ID: {enrollment_id} ===")
+            flash('Thank you for signing! Your legal digital signature has been sealed.', 'success')
+            return redirect(url_for('main_bp.thank_you'))
+            
+        except Exception as e:
+            db.session.rollback()
+            logger.error(f"CRITICAL CRYPTO ERROR: {str(e)}")
+            flash('An error occurred cryptographically sealing your signature. Please try again.', 'danger')
+            return redirect(url_for('main_bp.sign'))
+            
     return render_template('sign.html', form=form, settings=settings)
+
 
 @main_bp.route('/thank-you')
 def thank_you():

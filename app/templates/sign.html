@@ -1,21 +1,33 @@
-{% extends 'base.html' %}
-{% block content %}
-<div class="row justify-content-center">
-  <div class="col-lg-6">
-    <div class="card shadow p-4">
-      <h2 class="text-center fw-bold mb-3" style="color:#8B0000;">✍️ Sign the Petition</h2>
-      <p class="text-muted text-center">Lumbee Tribe members only.</p>
-      <hr>
-      <form method="POST" enctype="multipart/form-data">
-        {{ form.hidden_tag() }}
-        <div class="mb-3">{{ form.full_name.label(class='form-label fw-bold') }}{{ form.full_name(class='form-control') }}</div>
-        <div class="mb-3">{{ form.enrollment_id.label(class='form-label fw-bold') }}{{ form.enrollment_id(class='form-control') }}</div>
-        <div class="mb-3">{{ form.email.label(class='form-label fw-bold') }}{{ form.email(class='form-control') }}</div>
-        <div class="mb-3">{{ form.phone.label(class='form-label fw-bold') }}{{ form.phone(class='form-control') }}</div>
-        <div class="mb-3">{{ form.id_upload.label(class='form-label fw-bold') }}{{ form.id_upload(class='form-control') }}</div>
-        <div class="d-grid mt-4">{{ form.submit(class='btn btn-tribal btn-lg') }}</div>
-      </form>
+<form method="POST" action="{{ url_for('main_bp.sign') }}" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+
+    <div class="form-group">
+        {{ form.full_name.label }}
+        {{ form.full_name(class="form-control") }}
     </div>
-  </div>
-</div>
-{% endblock %}
+    
+    <div class="form-group">
+        {{ form.enrollment_id.label }}
+        {{ form.enrollment_id(class="form-control") }}
+    </div>
+
+    <div class="form-check" style="margin: 20px 0; padding: 15px; background-color: #f9f9f9; border-left: 4px solid #8B0000; border-radius: 4px;">
+        <div style="display: flex; align-items: flex-start; gap: 10px;">
+            {{ form.legal_consent(class="form-check-input", id="legal_consent", style="margin-top: 5px; scale: 1.2;") }}
+            <label class="form-check-label" for="legal_consent" style="font-size: 0.95em; color: #333; line-height: 1.4; font-weight: 500;">
+                I certify under penalty of perjury that I am a registered member of the Lumbee Tribe of North Carolina, and by checking this box and typing my name above, I am providing my legally binding digital signature equivalent to a physical wet signature for this petition to the Lumbee Election Board.
+            </label>
+        </div>
+        {# Display validation errors if they click submit without checking it #}
+        {% if form.legal_consent.errors %}
+            {% for error in form.legal_consent.errors %}
+                <div class="text-danger" style="margin-top: 5px; font-weight: bold; font-size: 0.85em;">{{ error }}</div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <div class="form-group">
+        {{ form.submit(class="btn btn-primary", style="width: 100%; font-weight: bold;") }}
+    </div>
+</form>
+
