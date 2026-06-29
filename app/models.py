@@ -48,4 +48,21 @@ class SiteSettings(db.Model):
 def load_user(user_id):
     return AdminUser.query.get(int(user_id))
 
+class DuplicateAttempt(db.Model):
+    __tablename__ = 'duplicate_attempts'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    full_name = db.Column(db.String(120), nullable=False)
+    enrollment_id = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(120), nullable=True)
+    ip_address = db.Column(db.String(50), nullable=True)
+    timestamp = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+
+    def __init__(self, full_name, enrollment_id, email, ip_address, timestamp=None):
+        self.full_name = full_name
+        self.enrollment_id = enrollment_id
+        self.email = email
+        self.ip_address = ip_address
+        if timestamp:
+            self.timestamp = timestamp
 
