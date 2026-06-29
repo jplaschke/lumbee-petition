@@ -237,10 +237,20 @@ def logout():
 @admin_bp.route('/dashboard')
 @login_required
 def dashboard():
+    from app.models import Signer, DuplicateAttempt
     settings = get_settings()
     count    = Signer.query.filter_by(verified=True).count()
-    signers  = Signer.query.order_by(Signer.timestamp.desc()).limit(50).all()
-    return render_template('admin/dashboard.html', settings=settings, count=count, signers=signers)
+
+    # Grab both lists right here
+    signers_list = Signer.query.order_by(Signer.timestamp.desc()).all()
+    duplicates_list = DuplicateAttempt.query.order_by(DuplicateAttempt.timestamp.desc()).all()
+
+    return render_template('admin/dashboard.html',
+                           settings=settings,
+                           count=count,
+                           signers=signers_list,
+                           duplicate_attempts=duplicates_list)
+
 
 @admin_bp.route('/settings', methods=['GET','POST'])
 @login_required
@@ -267,7 +277,7 @@ def signers():
     from app.models import Signer, DuplicateAttempt
     signers_list = Signer.query.all()
     duplicates_list = DuplicateAttempt.query.order_by(DuplicateAttempt.timestamp.desc()).all()
-    return render_template('signers.html', signers=signers_list, duplicate_attempts=duplicates_list)
+    return render_template('admin/signers.html', signers=signers_list, duplicate_attempts=duplicates_list)
 
 @admin_bp.route('/setup')
 def setup():
