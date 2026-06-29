@@ -8,7 +8,15 @@
   <tr>
     <td>{{ loop.index }}</td><td>{{ s.full_name }}</td><td>{{ s.enrollment_id }}</td>
     <td>{{ s.email }}</td><td>{{ s.phone or '-' }}</td><td>{{ s.ip_address or '-' }}</td>
-    <td>{{ s.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+    <!-- Update this specific column inside app/templates/signers.html -->
+    <td>
+        {% if s.timestamp.tzinfo %}
+        {{ s.timestamp.astimezone().strftime('%Y-%m-%d %I:%M %p') }}
+        {% else %}
+        {{ s.timestamp.strftime('%Y-%m-%d %I:%M %p') }}
+        {% endif %}
+    </td>
+
   </tr>
   {% endfor %}
   </tbody>
