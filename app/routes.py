@@ -57,130 +57,58 @@ def sign():
     form = SignatureForm()
     
     if form.validate_on_submit():
+        # 1. Grab clean string input immediately for validation
+        enrollment_id_clean = form.enrollment_id.data.strip()
+        
         # Check for duplicate signatures
-        if Signer.query.filter_by(enrollment_id=form.enrollment_id.data.strip()).first():
-            flash('This Enrollment ID has already signed.', 'danger')
-            return redirect(url_for('main_bp.sign'))
+        if Signer.query.filter_by(enrollment_id=enrollment_id_clean).first():
+            from app.models import DuplicateAttempt
+            from datetime import datetime, timezone, timedelta
             
-        # Handle the mandatory file upload (Guaranteed to exist thanks to FileRequired!)
-        id_filename = None
-        if form.id_upload.data and form.id_upload.data.filename:
-            id_filename = save_file(form.id_upload.data)
-        
-        # 1. Extract clean string inputs
-        from datetime import datetime, timezone, timedelta
-        
-        full_name = form.full_name.data.strip()
-        enrollment_id = form.enrollment_id.data.strip()
-        email = form.email.data.strip() if form.email.data else None
-        phone = form.phone.data.strip() if form.phone.data else None
-        
-        # FORCED EASTERN TIME OFFSET:
-        # Calculates explicit Eastern Time (UTC-5/UTC-4 depending on seasonality) 
-        # By querying the system shift dynamically:
-        local_now = datetime.now()
-        
-        # Check if we are currently in Daylight Saving Time (March - November)
-        # 0 = Monday, 6 = Sunday. This dynamically checks for standard North American changes.
-        is_dst = False
-        if 3 < local_now.month < 11:
-            is_dst = True
-        elif local_now.month == 3:
-            # Starts second Sunday of March
-            dst_start = datetime(local_now.year, 3, 8)
-            dst_start += timedelta(days=(6 - dst_start.weekday()))
-            if local_now >= dst_start:
+            # 2. Re-use your precise Eastern time calculation script
+            local_now = datetime.now()
+            is_dst = False
+            if 3 < local_now.month < 11:
                 is_dst = True
-        elif local_now.month == 11:
-            # Ends first Sunday of November
-            dst_end = datetime(local_now.year, 11, 1)
-            dst_end += timedelta(days=(6 - dst_end.weekday()))
-            if local_now < dst_end:
-                is_dst = True
+            elif local_now.month == 3:
+                dst_start = datetime(local_now.year, 3, 8)
+                dst_start += timedelta(days=(6 - dst_start.weekday()))
+                if local_now >= dst_start:
+                    is_dst = True
+            elif local_now.month == 11:
+                dst_end = datetime(local_now.year, 11, 1)
+                dst_end += timedelta(days=(6 - dst_end.weekday()))
+                if local_now < dst_end:
+                    is_dst = True
 
-        offset_hours = -4 if is_dst else -5
-        eastern_tz = timezone(timedelta(hours=offset_hours))
-        
-        # Locks both the real Eastern clock time and the explicit timezone indicator string
-        timestamp = datetime.now(eastern_tz)
+            offset_hours = -4 if is_dst else -5
+            eastern_tz = timezone(timedelta(hours=offset_hours))
+            timestamp = datetime.now(eastern_tz)
 
-        # 2. Extract proxy-safe Client IP on Render
-        if request.headers.getlist("X-Forwarded-For"):
-            ip_address = request.headers.getlist("X-Forwarded-For")[0].split(',')[0].strip()
-        else:
-            ip_address = request.remote_addr or "Unknown"
+            # 3. Capture proxy-safe Client IP
+            if request.headers.getlist("X-Forwarded-For"):
+                ip_address = request.headers.getlist("X-Forwarded-For")[0].split(',')[0].strip()
+            else:
+                ip_address = request.remote_addr or "Unknown"
 
-        # 3. Log data to the live terminal console for auditing and tracking
-        logger.info("=== NEW PETITION SIGNATURE ATTEMPT ===")
-        logger.info(f"Name: {full_name} | ID: {enrollment_id}")
-        logger.info(f"Attached ID File: {id_filename}")
-        logger.info(f"Verified Client IP: {ip_address}")
-        logger.info(f"Timestamp: {timestamp.isoformat()}")
-
-        try:
-            # 4. Generate unique RSA keys for asymmetric validation
-            private_key = rsa.generate_private_key(
-                public_exponent=65537,
-                key_size=2048
-            )
-            public_key = private_key.public_key()
-            
-            # Serialize Public Key to PEM format text for DB storage
-            pem_public_key = public_key.public_bytes(
-                encoding=serialization.Encoding.PEM,
-                format=serialization.PublicFormat.SubjectPublicKeyInfo
-            ).decode('utf-8')
-
-            # 5. Build the immutable legal manifest statement (Explicitly binding the ID file!)
-            signature_manifest = (
-                f"Petition Manifest: {PETITION_MANIFESTO}\n"
-                f"Signer Legal Name: {full_name}\n"
-                f"Enrollment ID: {enrollment_id}\n"
-                f"Verified ID Attachment: {id_filename}\n"
-                f"Timestamp ISO: {timestamp.isoformat()}\n"
-                f"Network IP Origin: {ip_address}"
-            )
-            
-            # 6. Cryptographically seal the manifest block using standard PKCS1v15 padding
-            message_bytes = signature_manifest.encode('utf-8')
-            raw_signature = private_key.sign(
-                message_bytes,
-                padding.PKCS1v15(),  # Switched to standard PKCS1v15 to fix version mismatches
-                hashes.SHA256()
-            )
-            # Encode binary data to clean, web-safe Base64 text
-            b64_signature = base64.b64encode(raw_signature).decode('utf-8')
-            
-            # 7. Build and populate the database record
-            signer = Signer(
-                full_name=full_name,
-                enrollment_id=enrollment_id,
-                email=email,
-                phone=phone,
+            # 4. Write this blocked attempt to the audit log
+            attempt = DuplicateAttempt(
+                full_name=form.full_name.data.strip(),
+                enrollment_id=enrollment_id_clean,
+                email=form.email.data.strip() if form.email.data else None,
                 ip_address=ip_address,
-                id_filename=id_filename,
-                timestamp=timestamp,
-                # New cryptographic audit columns
-                digital_signature=b64_signature,
-                public_key=pem_public_key,
-                manifest_data=signature_manifest
+                timestamp=timestamp
             )
-            
-            signer.set_hash()  # Runs your existing application specific hashing
-            db.session.add(signer)
+            db.session.add(attempt)
             db.session.commit()
-            
-            logger.info(f"=== SECURE AUDIT SIGNATURE RECODED FOR ID: {enrollment_id} ===")
-            flash('Thank you for signing! Your legal digital signature has been sealed.', 'success')
-            return redirect(url_for('main_bp.thank_you'))
-            
-        except Exception as e:
-            db.session.rollback()
-            logger.error(f"CRITICAL CRYPTO ERROR: {str(e)}")
-            flash('An error occurred cryptographically sealing your signature. Please try again.', 'danger')
+
+            # 5. Flash the user instructions directing them to technical help
+            flash(
+                f"⚠️ Submission Alert: Enrollment ID '{enrollment_id_clean}' has already signed this petition. "
+                f"If you believe this is an error, please contact Tech Support at (910) 521-7800 or support@lumbeemanifest.org.", 
+                "danger"
+            )
             return redirect(url_for('main_bp.sign'))
-            
-    return render_template('sign.html', form=form, settings=settings)
 
 
 @main_bp.route('/thank-you')
