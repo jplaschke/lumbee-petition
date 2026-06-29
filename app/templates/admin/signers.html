@@ -6,19 +6,66 @@
   <tbody>
   {% for s in signers %}
   <tr>
-    <td>{{ loop.index }}</td><td>{{ s.full_name }}</td><td>{{ s.enrollment_id }}</td>
-    <td>{{ s.email }}</td><td>{{ s.phone or '-' }}</td><td>{{ s.ip_address or '-' }}</td>
-    <!-- Update this specific column inside app/templates/signers.html -->
+    <td>{{ loop.index }}</td>
+    <td>{{ s.full_name }}</td>
+    <td>{{ s.enrollment_id }}</td>
+    <td>{{ s.email }}</td>
+    <td>{{ s.phone or '-' }}</td>
+    <td>{{ s.ip_address or '-' }}</td>
     <td>
-        {% if s.timestamp.tzinfo %}
+      {% if s.timestamp.tzinfo %}
         {{ s.timestamp.astimezone().strftime('%Y-%m-%d %I:%M %p') }}
-        {% else %}
+      {% else %}
         {{ s.timestamp.strftime('%Y-%m-%d %I:%M %p') }}
-        {% endif %}
+      {% endif %}
     </td>
-
   </tr>
   {% endfor %}
   </tbody>
 </table>
+
+<!-- ================================================================= -->
+<!-- TASK 4: PLACED SAFELY INSIDE THE CONTENT BLOCK BEFORE ENDBLOCK    -->
+<!-- ================================================================= -->
+<hr class="my-5">
+
+<h2 class="text-danger mt-4">⚠️ Blocked Duplicate Attempts Log</h2>
+<p class="text-muted small">The following matching enrollment IDs were blocked from signing twice to prevent double-voting:</p>
+
+<table class="table table-hover table-striped table-sm">
+  <thead class="table-dark">
+    <tr>
+      <th>#</th>
+      <th>Attempted Name</th>
+      <th>Enrollment ID</th>
+      <th>Submitted Email</th>
+      <th>Flagged IP Address</th>
+      <th>Date & Time Blocked</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for attempt in duplicate_attempts %}
+  <tr class="table-danger">
+    <td>{{ loop.index }}</td>
+    <td><strong>{{ attempt.full_name }}</strong></td>
+    <td><code class="text-danger fw-bold">{{ attempt.enrollment_id }}</code></td>
+    <td>{{ attempt.email or '-' }}</td>
+    <td><code>{{ attempt.ip_address or '-' }}</code></td>
+    <td>
+      {% if attempt.timestamp.tzinfo %}
+        {{ attempt.timestamp.astimezone().strftime('%Y-%m-%d %I:%M %p') }}
+      {% else %}
+        {{ attempt.timestamp.strftime('%Y-%m-%d %I:%M %p') }}
+      {% endif %}
+    </td>
+  </tr>
+  {% else %}
+  <tr>
+    <td colspan="6" class="text-muted py-3 text-center">🎉 No duplicate signature attempts detected yet. Clean data stream!</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
 {% endblock %}
+
