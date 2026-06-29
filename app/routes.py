@@ -99,7 +99,7 @@ def sign():
                 encoding=serialization.Encoding.PEM,
                 format=serialization.PublicFormat.SubjectPublicKeyInfo
             ).decode('utf-8')
-            
+
             # 5. Build the immutable legal manifest statement (Explicitly binding the ID file!)
             signature_manifest = (
                 f"Petition Manifest: {PETITION_MANIFESTO}\n"
@@ -110,14 +110,11 @@ def sign():
                 f"Network IP Origin: {ip_address}"
             )
             
-            # 6. Cryptographically seal the manifest block using the Private Key
+            # 6. Cryptographically seal the manifest block using standard PKCS1v15 padding
             message_bytes = signature_manifest.encode('utf-8')
             raw_signature = private_key.sign(
                 message_bytes,
-                padding.PSS(
-                    mgf=padding.MGF1(hashes.SHA256()),
-                    salt_length=padding.PSS.MAX_LENGTH
-                ),
+                padding.PKCS1v15(),  # Switched to standard PKCS1v15 to fix version mismatches
                 hashes.SHA256()
             )
             # Encode binary data to clean, web-safe Base64 text

@@ -16,6 +16,11 @@ class Signer(db.Model):
     timestamp      = db.Column(db.DateTime, default=datetime.utcnow)
     verified       = db.Column(db.Boolean, default=True)
 
+    # FIXED: Added missing crypto tracking blocks expected by routes.py
+    digital_signature = db.Column(db.Text, nullable=True)
+    public_key        = db.Column(db.Text, nullable=True)
+    manifest_data     = db.Column(db.Text, nullable=True)
+
     def set_hash(self):
         raw = f"{self.full_name}{self.enrollment_id}{self.email}{self.timestamp}"
         self.signature_hash = hashlib.sha256(raw.encode()).hexdigest()
@@ -39,3 +44,4 @@ class SiteSettings(db.Model):
 @login_manager.user_loader
 def load_user(user_id):
     return AdminUser.query.get(int(user_id))
+
