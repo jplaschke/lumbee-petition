@@ -261,7 +261,7 @@ def settings():
         return redirect(url_for('admin_bp.settings'))
     return render_template('admin/settings.html', form=form, settings=s)
 
-@admin_bp.route('/admin/signers')
+@admin_bp.route('/signers')
 @login_required
 def signers():
     from app.models import Signer, DuplicateAttempt
