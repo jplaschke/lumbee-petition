@@ -66,17 +66,43 @@ def sign():
         id_filename = None
         if form.id_upload.data and form.id_upload.data.filename:
             id_filename = save_file(form.id_upload.data)
-            
+        
         # 1. Extract clean string inputs
-        from datetime import timezone
+        from datetime import datetime, timezone, timedelta
         
         full_name = form.full_name.data.strip()
         enrollment_id = form.enrollment_id.data.strip()
         email = form.email.data.strip() if form.email.data else None
         phone = form.phone.data.strip() if form.phone.data else None
         
-        # UPDATED: Captures current time and attaches system local timezone info automatically
-        timestamp = datetime.now().astimezone()
+        # FORCED EASTERN TIME OFFSET:
+        # Calculates explicit Eastern Time (UTC-5/UTC-4 depending on seasonality) 
+        # By querying the system shift dynamically:
+        local_now = datetime.now()
+        
+        # Check if we are currently in Daylight Saving Time (March - November)
+        # 0 = Monday, 6 = Sunday. This dynamically checks for standard North American changes.
+        is_dst = False
+        if 3 < local_now.month < 11:
+            is_dst = True
+        elif local_now.month == 3:
+            # Starts second Sunday of March
+            dst_start = datetime(local_now.year, 3, 8)
+            dst_start += timedelta(days=(6 - dst_start.weekday()))
+            if local_now >= dst_start:
+                is_dst = True
+        elif local_now.month == 11:
+            # Ends first Sunday of November
+            dst_end = datetime(local_now.year, 11, 1)
+            dst_end += timedelta(days=(6 - dst_end.weekday()))
+            if local_now < dst_end:
+                is_dst = True
+
+        offset_hours = -4 if is_dst else -5
+        eastern_tz = timezone(timedelta(hours=offset_hours))
+        
+        # Locks both the real Eastern clock time and the explicit timezone indicator string
+        timestamp = datetime.now(eastern_tz)
 
         # 2. Extract proxy-safe Client IP on Render
         if request.headers.getlist("X-Forwarded-For"):
