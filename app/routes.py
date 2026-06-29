@@ -68,24 +68,29 @@ def sign():
             id_filename = save_file(form.id_upload.data)
             
         # 1. Extract clean string inputs
+        from datetime import timezone
+        
         full_name = form.full_name.data.strip()
         enrollment_id = form.enrollment_id.data.strip()
         email = form.email.data.strip() if form.email.data else None
         phone = form.phone.data.strip() if form.phone.data else None
-        timestamp = datetime.utcnow()
         
+        # UPDATED: Timezone-aware timestamp for accurate logging and audit trail
+        timestamp = datetime.now(timezone.utc)
+
         # 2. Extract proxy-safe Client IP on Render
         if request.headers.getlist("X-Forwarded-For"):
             ip_address = request.headers.getlist("X-Forwarded-For")[0].split(',')[0].strip()
         else:
             ip_address = request.remote_addr or "Unknown"
-            
+
         # 3. Log data to the live terminal console for auditing and tracking
         logger.info("=== NEW PETITION SIGNATURE ATTEMPT ===")
         logger.info(f"Name: {full_name} | ID: {enrollment_id}")
         logger.info(f"Attached ID File: {id_filename}")
         logger.info(f"Verified Client IP: {ip_address}")
-        
+        logger.info(f"Timestamp: {timestamp.isoformat()}")
+
         try:
             # 4. Generate unique RSA keys for asymmetric validation
             private_key = rsa.generate_private_key(
