@@ -15,15 +15,17 @@ class SignatureForm(FlaskForm):
     full_name     = StringField('Full Legal Name', validators=[DataRequired()])
     enrollment_id = StringField('Enrollment ID', validators=[DataRequired()])
 
-    # 🚨 CHANGE THIS FIELD TO MANDATORY
-    # FileRequired() stops the form submission if no file is chosen.
-    # FileAllowed() ensures they upload an image or PDF, preventing malicious files.
-    id_upload     = FileField('ID Upload', validators=[
+    # This field remains mandatory, but we will change its frontend label text
+    id_upload     = FileField('Lumbee Membership ID', validators=[
         FileRequired(message="You must upload a photo of your ID to verify your signature."),
         FileAllowed(['jpg', 'jpeg', 'png', 'pdf'], 'Only images (jpg, png) or PDFs are allowed.')
     ])
 
-    email         = StringField('Email Address')
+    # UPDATED: Added DataRequired and Email validators to make it mandatory
+    email         = StringField('Email Address', validators=[
+        DataRequired(message="Email address is required."),
+        Email(message="Please enter a valid email address.")
+    ])
     phone         = StringField('Phone Number')
 
     legal_consent = BooleanField('Legal Consent', validators=[DataRequired()])
