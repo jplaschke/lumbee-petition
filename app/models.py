@@ -47,29 +47,5 @@ class SiteSettings(db.Model):
 @login_manager.user_loader
 def load_user(user_id):
     return AdminUser.query.get(int(user_id))
-from app import db, create_app
-from app.models import AdminUser
-from werkzeug.security import generate_password_hash
 
-app = create_app()
-with app.app_context():
-    # Clear out any previous broken entries to ensure no duplication issues
-    AdminUser.query.delete()
-    
-    # Securely hash your new password string
-    hashed_password = generate_password_hash("WolfPackRul3s$")
-    
-    # Inject your requested username and hashed password
-    new_admin = AdminUser(
-        username="lumbee-admin", 
-        password=hashed_password
-    )
-    
-    db.session.add(new_admin)
-    db.session.commit()
-    print("\n======================================")
-    print("✅ SUCCESS: ACCOUNT RE-INITIALIZED!")
-    print("User: lumbee-admin")
-    print("======================================\n")
 
-exit()
