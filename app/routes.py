@@ -75,8 +75,8 @@ def sign():
         email = form.email.data.strip() if form.email.data else None
         phone = form.phone.data.strip() if form.phone.data else None
         
-        # UPDATED: Timezone-aware timestamp for accurate logging and audit trail
-        timestamp = datetime.now(timezone.utc)
+        # UPDATED: Captures current time and attaches system local timezone info automatically
+        timestamp = datetime.now().astimezone()
 
         # 2. Extract proxy-safe Client IP on Render
         if request.headers.getlist("X-Forwarded-For"):
