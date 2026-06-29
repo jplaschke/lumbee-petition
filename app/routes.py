@@ -264,11 +264,20 @@ def settings():
         return redirect(url_for('admin_bp.settings'))
     return render_template('admin/settings.html', form=form, settings=s)
 
-@admin_bp.route('/signers')
+@admin_bp.route('/admin/signers')  # or whatever your admin signers URL route is named
 @login_required
 def signers():
-    all_signers = Signer.query.order_by(Signer.timestamp.desc()).all()
-    return render_template('admin/signers.html', signers=all_signers)
+    # 1. Import the model tracking class at the top of the function
+    from app.models import Signer, DuplicateAttempt
+
+    # 2. Fetch all rows sorted cleanly by submission order
+    signers_list = Signer.query.all()
+    duplicates_list = DuplicateAttempt.query.order_by(DuplicateAttempt.timestamp.desc()).all()
+
+    # 3. Inject BOTH datasets straight down into your signers.html template
+    return render_template('signers.html',
+                           signers=signers_list,
+                           duplicate_attempts=duplicates_list)
 
 @admin_bp.route('/setup')
 def setup():
