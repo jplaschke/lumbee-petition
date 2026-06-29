@@ -1,0 +1,728 @@
+{% extends "base.html" %}
+{% block title %}Proposed Initiative Ordinance No. 2026-PI — Lumbee Tribe{% endblock %}
+
+{% block head_extra %}
+<style>
+  /* ── Initiative Banner ── */
+  .initiative-banner {
+    background: linear-gradient(135deg, #1a3a5c 0%, #0d2238 100%);
+    color: #fff;
+    padding: 28px 24px 20px;
+    text-align: center;
+    border-bottom: 4px solid #c8a951;
+    margin-bottom: 0;
+  }
+
+  .initiative-badge {
+    display: inline-block;
+    background: #c8a951;
+    color: #1a1a1a;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 2px;
+    margin-bottom: 12px;
+  }
+
+  .initiative-banner h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+
+  .initiative-banner .ordinance-num {
+    font-size: 1.1rem;
+    color: #c8a951;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+  }
+
+  .initiative-banner .initiative-sub {
+    font-size: 0.85rem;
+    color: #a8c4e0;
+    font-style: italic;
+  }
+
+  /* ── NOT-A-COUNCIL-ORDINANCE Alert ── */
+  .not-council-alert {
+    background: #fff3cd;
+    border-left: 6px solid #e67e00;
+    padding: 14px 18px;
+    margin: 0 0 24px 0;
+    font-size: 0.88rem;
+    color: #5a3800;
+    line-height: 1.6;
+  }
+
+  .not-council-alert strong {
+    display: block;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+    color: #3a2200;
+  }
+
+  /* ── Article V Badge ── */
+  .article-v-badge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #eef4fb;
+    border: 1px solid #b0c8e8;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+  }
+
+  .article-v-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+  }
+
+  .article-v-text {
+    font-size: 0.88rem;
+    color: #1a3a5c;
+    line-height: 1.6;
+  }
+
+  .article-v-text strong {
+    display: block;
+    font-size: 0.95rem;
+    margin-bottom: 2px;
+  }
+
+  /* ── Progress Bar ── */
+  .progress-section {
+    background: #fff;
+    border: 1px solid #dde4ee;
+    border-radius: 8px;
+    padding: 20px 22px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #1a3a5c;
+    margin-bottom: 8px;
+  }
+
+  .progress-bar-outer {
+    background: #e0e8f4;
+    border-radius: 100px;
+    height: 18px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+
+  .progress-bar-inner {
+    height: 100%;
+    background: linear-gradient(90deg, #1a3a5c, #2e6da4);
+    border-radius: 100px;
+    transition: width 0.6s ease;
+    min-width: 4px;
+  }
+
+  .progress-meta {
+    display: flex;
+    gap: 20px;
+    font-size: 0.82rem;
+    color: #555;
+  }
+
+  .progress-meta span strong {
+    color: #1a3a5c;
+  }
+
+  /* ── Committee Section ── */
+  .committee-section {
+    background: #fff;
+    border: 1px solid #dde4ee;
+    border-radius: 8px;
+    padding: 20px 22px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+
+  .committee-section h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1a3a5c;
+    margin-bottom: 4px;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .committee-section .committee-sub {
+    font-size: 0.82rem;
+    color: #666;
+    margin-bottom: 16px;
+    font-style: italic;
+  }
+
+  .committee-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+  }
+
+  .committee-card {
+    border: 1px solid #c8d8ee;
+    border-radius: 6px;
+    padding: 14px 16px;
+    background: #f5f8fc;
+    text-align: center;
+  }
+
+  .committee-card .member-num {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #2e6da4;
+    margin-bottom: 6px;
+  }
+
+  .committee-card .member-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+  }
+
+  .committee-card .member-id {
+    font-size: 0.8rem;
+    color: #666;
+    font-family: monospace;
+  }
+
+  .committee-card.unfilled {
+    background: #f9f9f9;
+    border-style: dashed;
+    border-color: #bbb;
+  }
+
+  .committee-card.unfilled .member-name {
+    color: #aaa;
+    font-style: italic;
+  }
+
+  /* ── Ordinance Preview ── */
+  .ordinance-preview {
+    background: #fff;
+    border: 1px solid #dde4ee;
+    border-radius: 8px;
+    padding: 20px 22px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+
+  .ordinance-preview h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1a3a5c;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .ordinance-scroll {
+    max-height: 320px;
+    overflow-y: auto;
+    background: #f8fafc;
+    border: 1px solid #cdd8e8;
+    border-radius: 4px;
+    padding: 16px;
+    font-size: 0.85rem;
+    line-height: 1.75;
+    white-space: pre-wrap;
+    font-family: Georgia, serif;
+    color: #222;
+  }
+
+  .ordinance-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+
+  .btn-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #1a3a5c;
+    color: #fff;
+    padding: 9px 18px;
+    border-radius: 5px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-download:hover { background: #0d2238; }
+
+  .btn-print {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    color: #1a3a5c;
+    padding: 9px 18px;
+    border-radius: 5px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-decoration: none;
+    border: 2px solid #1a3a5c;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-print:hover {
+    background: #1a3a5c;
+    color: #fff;
+  }
+
+  /* ── Hash Integrity Strip ── */
+  .hash-strip {
+    background: #1a1a2e;
+    color: #7ec8e3;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.78rem;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .hash-strip .hash-icon { font-size: 1.1rem; }
+  .hash-strip .hash-label { color: #a0c4d8; font-weight: 600; }
+  .hash-strip .hash-val { color: #e0f4ff; word-break: break-all; }
+  .hash-strip .hash-status-ok {
+    margin-left: auto;
+    background: #1a5c3a;
+    color: #7effc4;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  /* ── Sign Form ── */
+  .sign-section {
+    background: #fff;
+    border: 2px solid #1a3a5c;
+    border-radius: 8px;
+    padding: 24px 26px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 16px rgba(26,58,92,0.10);
+  }
+
+  .sign-section h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1a3a5c;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .sign-section .sign-sub {
+    font-size: 0.85rem;
+    color: #555;
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  @media (max-width: 600px) {
+    .form-grid { grid-template-columns: 1fr; }
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .form-group label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #1a3a5c;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .form-group input {
+    border: 1px solid #b0c4de;
+    border-radius: 4px;
+    padding: 9px 12px;
+    font-size: 0.92rem;
+    color: #1a1a1a;
+    transition: border-color 0.2s;
+    font-family: inherit;
+  }
+
+  .form-group input:focus {
+    outline: none;
+    border-color: #1a3a5c;
+    box-shadow: 0 0 0 3px rgba(26,58,92,0.12);
+  }
+
+  .affirmation-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: #f0f4f8;
+    border: 1px solid #c0d0e8;
+    border-radius: 5px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    font-size: 0.88rem;
+    color: #333;
+    line-height: 1.6;
+    cursor: pointer;
+  }
+
+  .affirmation-check input[type="checkbox"] {
+    margin-top: 3px;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    accent-color: #1a3a5c;
+  }
+
+  .btn-sign {
+    width: 100%;
+    background: linear-gradient(135deg, #1a3a5c, #2e6da4);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 13px;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    text-transform: uppercase;
+  }
+
+  .btn-sign:hover { opacity: 0.9; }
+  .btn-sign:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* ── Recent Signers ── */
+  .signers-section {
+    background: #fff;
+    border: 1px solid #dde4ee;
+    border-radius: 8px;
+    padding: 20px 22px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+
+  .signers-section h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1a3a5c;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .signer-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .signer-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.88rem;
+    color: #333;
+    padding: 8px 12px;
+    background: #f8fafc;
+    border-radius: 5px;
+    border: 1px solid #e4eaf4;
+  }
+
+  .signer-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1a3a5c, #2e6da4);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+
+  .signer-name { font-weight: 600; }
+  .signer-city { color: #777; font-size: 0.82rem; }
+  .signer-date { margin-left: auto; color: #999; font-size: 0.78rem; }
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--                INITIATIVE BANNER                       -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="initiative-banner">
+  <div class="initiative-badge">⚖️ Article V — Citizen Initiative</div>
+  <div class="ordinance-num">PROPOSED INITIATIVE ORDINANCE NO. 2026-PI</div>
+  <h1>Lumbee Gaming Governance,<br>Transparency & Economic Development Act</h1>
+  <div class="initiative-sub">
+    Proposed by Enrolled Members of the Lumbee Tribe of North Carolina<br>
+    pursuant to Article V of the Lumbee Tribe Constitution
+  </div>
+</div>
+
+<div class="container" style="max-width:820px; margin:0 auto; padding:28px 16px;">
+
+  <!-- NOT A COUNCIL ORDINANCE ALERT -->
+  <div class="not-council-alert">
+    <strong>⚠️ CITIZEN INITIATIVE — NOT A TRIBAL COUNCIL ORDINANCE</strong>
+    This document is a proposed ordinance submitted by enrolled members pursuant
+    to <strong>Article V</strong> of the Constitution of the Lumbee Tribe of North
+    Carolina. It has <strong>NOT</strong> been enacted by the Tribal Council and
+    does <strong>NOT</strong> carry the force of law until approved by the General
+    Membership through the constitutionally prescribed initiative process.
+  </div>
+
+  <!-- ARTICLE V BADGE -->
+  <div class="article-v-badge">
+    <div class="article-v-icon">📜</div>
+    <div class="article-v-text">
+      <strong>Your Constitutional Right — Article V Initiative Power</strong>
+      The Constitution of the Lumbee Tribe reserves to the General Membership
+      the power to initiate ordinances affecting fundamental rights, including
+      any ordinance authorizing gaming. Your signature supports placing this
+      measure before all enrolled members for a vote.
+    </div>
+  </div>
+
+  <!-- PROGRESS BAR -->
+  <div class="progress-section">
+    {% set pct = ((total_signatures / goal) * 100) | round(1) %}
+    <div class="progress-label">
+      <span>📊 Petition Progress</span>
+      <span>{{ pct }}% of goal</span>
+    </div>
+    <div class="progress-bar-outer">
+      <div class="progress-bar-inner"
+           style="width: {{ [pct, 100] | min }}%">
+      </div>
+    </div>
+    <div class="progress-meta">
+      <span>✍️ <strong>{{ total_signatures }}</strong> signatures collected</span>
+      <span>🎯 Goal: <strong>{{ goal }}</strong> enrolled members</span>
+      <span>📅 Started: <strong>{{ start_date }}</strong></span>
+    </div>
+  </div>
+
+  <!-- PETITION COMMITTEE -->
+  <div class="committee-section">
+    <h3>📋 Petition Committee — Article V</h3>
+    <div class="committee-sub">
+      Three enrolled members responsible for circulating,
+      verifying, and submitting this initiative petition.
+    </div>
+    <div class="committee-grid">
+      {% for member in committee_members %}
+      <div class="committee-card
+        {{ 'unfilled' if not member.full_name or member.full_name.startswith('[') }}">
+        <div class="member-num">Committee Member {{ loop.index }}</div>
+        <div class="member-name">
+          {% if member.full_name and not member.full_name.startswith('[') %}
+            {{ member.full_name }}
+          {% else %}
+            Position Unfilled
+          {% endif %}
+        </div>
+        <div class="member-id">
+          {% if member.enrollment_id and not member.enrollment_id.startswith('[') %}
+            ID: {{ member.enrollment_id }}
+          {% else %}
+            Enrollment ID Pending
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- HASH INTEGRITY STRIP -->
+  <div class="hash-strip">
+    <span class="hash-icon">🔐</span>
+    <span class="hash-label">Document Integrity:</span>
+    <span class="hash-val">{{ current_hash[:64] }}...</span>
+    {% if hash_match %}
+    <span class="hash-status-ok">✓ VERIFIED</span>
+    {% else %}
+    <span style="margin-left:auto; background:#5c1a1a; color:#ffb3b3;
+                 padding:3px 10px; border-radius:100px; font-size:0.75rem;
+                 font-weight:700; white-space:nowrap;">
+      ⚠️ MISMATCH
+    </span>
+    {% endif %}
+  </div>
+
+  <!-- ORDINANCE PREVIEW -->
+  <div class="ordinance-preview">
+    <h3>📄 Proposed Ordinance Text</h3>
+    <div class="ordinance-scroll">{{ ordinance_text }}</div>
+    <div class="ordinance-actions">
+      <a href="{{ url_for('print_ordinance') }}"
+         target="_blank"
+         class="btn-download">
+        🖨️ View / Print Full Ordinance
+      </a>
+      <a href="{{ url_for('download_ordinance_pdf') }}"
+         class="btn-download">
+        📥 Download PDF
+      </a>
+      <button onclick="window.print()" class="btn-print">
+        🖨️ Print This Page
+      </button>
+    </div>
+  </div>
+
+  <!-- SIGN THE PETITION -->
+  <div class="sign-section">
+    <h3>✍️ Sign the Initiative Petition</h3>
+    <div class="sign-sub">
+      By signing, you affirm that you are an enrolled member of the Lumbee
+      Tribe of North Carolina and support placing
+      <strong>Proposed Initiative Ordinance No. 2026-PI</strong> before
+      the General Membership for a vote pursuant to Article V.
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+      <div class="alert alert-{{ category }} mb-3" style="padding:10px 14px;
+           border-radius:5px; font-size:0.9rem;
+           background:{{ '#d4edda' if category == 'success' else '#f8d7da' }};
+           color:{{ '#155724' if category == 'success' else '#721c24' }};
+           border:1px solid {{ '#c3e6cb' if category == 'success' else '#f5c6cb' }}">
+        {{ message }}
+      </div>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('sign_petition') }}" id="signForm">
+      {{ form.hidden_tag() if form.hidden_tag is defined }}
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="first_name">First Name *</label>
+          <input type="text" id="first_name" name="first_name"
+                 placeholder="First name" required>
+        </div>
+        <div class="form-group">
+          <label for="last_name">Last Name *</label>
+          <input type="text" id="last_name" name="last_name"
+                 placeholder="Last name" required>
+        </div>
+        <div class="form-group">
+          <label for="enrollment_id">Enrollment ID *</label>
+          <input type="text" id="enrollment_id" name="enrollment_id"
+                 placeholder="Lumbee enrollment number" required>
+        </div>
+        <div class="form-group">
+          <label for="city">City / Community</label>
+          <input type="text" id="city" name="city"
+                 placeholder="City or community">
+        </div>
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email"
+                 placeholder="your@email.com">
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone (Optional)</label>
+          <input type="tel" id="phone" name="phone"
+                 placeholder="(910) 000-0000">
+        </div>
+      </div>
+
+      <label class="affirmation-check">
+        <input type="checkbox" name="affirm" id="affirmCheck" required>
+        <span>
+          I affirm that I am an enrolled member of the Lumbee Tribe of North
+          Carolina, I have had the opportunity to read this Proposed Ordinance,
+          I support placing it before the General Membership for a vote, and
+          I have not previously signed this petition.
+        </span>
+      </label>
+
+      <button type="submit" class="btn-sign" id="signBtn" disabled>
+        ✍️ SIGN THE INITIATIVE PETITION
+      </button>
+    </form>
+  </div>
+
+  <!-- RECENT SIGNERS -->
+  <div class="signers-section">
+    <h3>✅ Recent Petition Signers</h3>
+    <ul class="signer-list">
+      {% for signer in recent_signers %}
+      <li class="signer-item">
+        <div class="signer-avatar">
+          {{ signer.first_name[0] | upper }}{{ signer.last_name[0] | upper }}
+        </div>
+        <div>
+          <div class="signer-name">
+            {{ signer.first_name }} {{ signer.last_name[0] }}.
+          </div>
+          <div class="signer-city">{{ signer.city or 'Lumbee Territory' }}</div>
+        </div>
+        <div class="signer-date">
+          {{ signer.signed_at.strftime('%b %d, %Y') }}
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+  // Enable sign button only when affirmation is checked
+  const affirmCheck = document.getElementById('affirmCheck');
+  const signBtn     = document.getElementById('signBtn');
+  affirmCheck.addEventListener('change', function() {
+    signBtn.disabled = !this.checked;
+  });
+</script>
+
+{% endblock %}
+

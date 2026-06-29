@@ -1,12 +1,42 @@
+# ── Core Framework ────────────────────────────────────────
 Flask==2.3.3
+Werkzeug==2.3.7
+
+# ── Database ──────────────────────────────────────────────
 Flask-SQLAlchemy==3.0.5
-Flask-Login==0.6.3
+SQLAlchemy==2.0.21
+
+# ── Forms & Validation ────────────────────────────────────
 Flask-WTF==1.1.1
 WTForms==3.0.1
 email-validator==2.0.0
-Werkzeug==2.3.7
-gunicorn==21.2.0
-SQLAlchemy==2.0.21
-Pillow==10.0.0
+
+# ── Authentication ────────────────────────────────────────
+Flask-Login==0.6.3
+
+# ── Security ──────────────────────────────────────────────
 cryptography>=44.0.0
+
+# ── Image Handling ────────────────────────────────────────
+Pillow==10.0.0
+
+# ── PDF Generation ────────────────────────────────────────
+weasyprint==62.3
+
+# ── PDF Text Extraction (upload feature) ──────────────────
+PyMuPDF==1.24.5
+
+# ── Timezone Support ──────────────────────────────────────
+pytz==2024.1
+
+# ── Production Server ─────────────────────────────────────
+gunicorn==21.2.0
+
+# ── Rate Limiting ─────────────────────────────────────────
+Flask-Limiter==3.8.0
+
+# ── Standard Library (no install needed) ──────────────────
+# hashlib  ← built-in
+# datetime ← built-in
+# json     ← built-in
 

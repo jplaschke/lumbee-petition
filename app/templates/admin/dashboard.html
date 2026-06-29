@@ -1,244 +1,417 @@
-{% extends 'admin/base_admin.html' %}
+{% extends "base.html" %}
 {% block content %}
 
-<!-- ======================== -->
-<!--      PAGE HEADER         -->
-<!-- ======================== -->
-<h2>📊 Admin Dashboard</h2>
-<p class="subtitle">{{ settings.petition_title }}</p>
+<div class="container-fluid py-4" style="background:#f8f5f0; min-height:100vh;">
 
-<!-- ======================== -->
-<!--      STATS SUMMARY       -->
-<!-- ======================== -->
-<div class="stats-grid">
-
-  <div class="stat-card">
-    <h3>{{ count }}</h3>
-    <p>✅ Verified Signatures</p>
+  <!-- ═══════════════════════════════════════════════
+       HEADER — PROPOSED ORDINANCE BANNER
+  ═══════════════════════════════════════════════ -->
+  <div class="text-center mb-4">
+    <div style="background:#8B0000; color:#fff; border-radius:8px; padding:24px 16px;">
+      <div style="font-size:0.85rem; letter-spacing:2px; text-transform:uppercase; opacity:0.8;">
+        Lumbee Tribe of North Carolina — Article V Initiative
+      </div>
+      <h1 style="font-size:1.6rem; font-weight:700; margin:8px 0;">
+        PROPOSED ORDINANCE NO. 2026-
+      </h1>
+      <div style="font-size:1rem; opacity:0.9;">
+        Lumbee Gaming Governance, Transparency, and Economic Development Act
+      </div>
+      <div class="mt-2" style="font-size:0.8rem; opacity:0.7;">
+        Citizen Initiative Petition — Admin Dashboard
+      </div>
+    </div>
   </div>
 
-  <div class="stat-card">
-    <h3>{{ settings.target_signatures }}</h3>
-    <p>🎯 Target</p>
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <!-- ═══════════════════════════════════════════════
+       STAT CARDS
+  ═══════════════════════════════════════════════ -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="card text-center shadow-sm h-100">
+        <div class="card-body">
+          <div style="font-size:2rem; font-weight:700; color:#8B0000;">{{ count }}</div>
+          <div class="text-muted small">Verified Signatures</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card text-center shadow-sm h-100">
+        <div class="card-body">
+          <div style="font-size:2rem; font-weight:700; color:#555;">
+            {{ settings.target_signatures if settings else 500 }}
+          </div>
+          <div class="text-muted small">Signatures Required</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card text-center shadow-sm h-100">
+        <div class="card-body">
+          {% set target = settings.target_signatures if settings else 500 %}
+          {% set pct = ((count / target) * 100) | round(1) if target > 0 else 0 %}
+          <div style="font-size:2rem; font-weight:700; color:#8B0000;">{{ pct }}%</div>
+          <div class="text-muted small">Progress</div>
+          <div class="progress mt-2" style="height:8px;">
+            <div class="progress-bar" style="width:{{ [pct,100]|min }}%; background:#8B0000;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card text-center shadow-sm h-100">
+        <div class="card-body">
+          <div style="font-size:2rem; font-weight:700; color:#c0392b;">
+            {{ duplicate_attempts | length }}
+          </div>
+          <div class="text-muted small">Rejected Duplicates</div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="stat-card">
-    <h3>{{ ((count / (settings.target_signatures or 1)) * 100) | int }}%</h3>
-    <p>📈 Progress</p>
+  <!-- ═══════════════════════════════════════════════
+       SECTION A — PETITION COMMITTEE (Article V)
+  ═══════════════════════════════════════════════ -->
+  <div id="committee" class="card shadow-sm mb-4">
+    <div class="card-header" style="background:#8B0000; color:#fff;">
+      <h5 class="mb-0">⚖️ Article V — Petition Committee Members</h5>
+      <small style="opacity:0.8;">
+        Three enrolled members responsible for circulating and certifying this initiative petition
+      </small>
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+        {% for member in committee %}
+        <div class="col-md-4">
+          <div class="card h-100 border {% if member.is_filled %}border-success{% else %}border-warning{% endif %}">
+            <div class="card-header d-flex justify-content-between align-items-center
+              {% if member.is_filled %}bg-success text-white{% else %}bg-warning{% endif %}">
+              <strong>Committee Member {{ member.slot }}</strong>
+              {% if member.is_filled %}
+                <span class="badge bg-light text-success">✅ Assigned</span>
+              {% else %}
+                <span class="badge bg-light text-warning">⏳ Placeholder</span>
+              {% endif %}
+            </div>
+            <div class="card-body">
+              {% if member.is_filled %}
+                <p class="mb-1"><strong>Name:</strong> {{ member.full_name }}</p>
+                <p class="mb-1"><strong>Enrollment ID:</strong> {{ member.enrollment_id or '—' }}</p>
+                <p class="mb-1"><strong>Address:</strong> {{ member.address or '—' }}</p>
+                <p class="mb-1"><strong>Phone:</strong> {{ member.phone or '—' }}</p>
+                <p class="mb-1"><strong>Email:</strong> {{ member.email or '—' }}</p>
+                <p class="mb-0 text-muted small">
+                  Assigned: {{ member.assigned_at.strftime('%B %d, %Y') if member.assigned_at else '—' }}
+                </p>
+              {% else %}
+                <p class="text-muted fst-italic mb-2">
+                  [PLACEHOLDER — No member assigned yet]
+                </p>
+                <p class="text-muted small mb-0">
+                  Per Article V of the Lumbee Tribe Constitution, three enrolled members
+                  must serve as the Petition Committee to circulate this initiative.
+                </p>
+              {% endif %}
+            </div>
+            <div class="card-footer bg-light">
+              <!-- Edit Form -->
+              <button class="btn btn-sm btn-outline-dark w-100"
+                data-bs-toggle="collapse"
+                data-bs-target="#edit-member-{{ member.slot }}">
+                ✏️ {{ 'Edit' if member.is_filled else 'Assign' }} Member {{ member.slot }}
+              </button>
+              <div class="collapse mt-2" id="edit-member-{{ member.slot }}">
+                <form method="POST"
+                  action="{{ url_for('update_committee_member', slot=member.slot) }}">
+                  <div class="mb-2">
+                    <input type="text" name="full_name" class="form-control form-control-sm"
+                      placeholder="Full Name *"
+                      value="{{ member.full_name or '' }}" required>
+                  </div>
+                  <div class="mb-2">
+                    <input type="text" name="enrollment_id" class="form-control form-control-sm"
+                      placeholder="Enrollment ID"
+                      value="{{ member.enrollment_id or '' }}">
+                  </div>
+                  <div class="mb-2">
+                    <input type="text" name="address" class="form-control form-control-sm"
+                      placeholder="Address"
+                      value="{{ member.address or '' }}">
+                  </div>
+                  <div class="mb-2">
+                    <input type="tel" name="phone" class="form-control form-control-sm"
+                      placeholder="Phone"
+                      value="{{ member.phone or '' }}">
+                  </div>
+                  <div class="mb-2">
+                    <input type="email" name="email" class="form-control form-control-sm"
+                      placeholder="Email"
+                      value="{{ member.email or '' }}">
+                  </div>
+                  <button type="submit" class="btn btn-sm btn-danger w-100">
+                    💾 Save Member {{ member.slot }}
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Article V Notice -->
+      <div class="alert alert-secondary mt-3 mb-0" style="font-size:0.85rem;">
+        <strong>📜 Article V — Initiative:</strong>
+        The petition committee consists of three enrolled members who are responsible for
+        circulating the petition, verifying signatures, and submitting the completed petition
+        to the tribal government for certification. Each member must be an enrolled member
+        of the Lumbee Tribe of North Carolina.
+      </div>
+    </div>
   </div>
 
-  <div class="stat-card rejected">
-    <h3>{{ duplicate_attempts | length }}</h3>
-    <p>🚫 Rejected Duplicates</p>
+  <!-- ═══════════════════════════════════════════════
+       SECTION B — DOCUMENT HASH TRACKING
+  ═══════════════════════════════════════════════ -->
+  <div id="hash-log" class="card shadow-sm mb-4">
+    <div class="card-header" style="background:#1a1a2e; color:#fff;">
+      <h5 class="mb-0">🔐 Document Integrity — SHA-256 Hash Tracking</h5>
+      <small style="opacity:0.8;">
+        Immutable cryptographic fingerprint — any change to the ordinance text invalidates the hash
+      </small>
+    </div>
+    <div class="card-body">
+
+      <!-- Current Hash Display -->
+      {% if current_hash %}
+      <div class="alert mb-3" style="background:#0d1b2a; color:#00ff88; font-family:monospace; border:1px solid #00ff88;">
+        <div style="font-size:0.75rem; opacity:0.7; margin-bottom:4px;">
+          ✅ CURRENT VERIFIED HASH — {{ current_hash.timestamp.strftime('%B %d, %Y at %I:%M %p UTC') }}
+        </div>
+        <div style="font-size:0.95rem; word-break:break-all; font-weight:700;">
+          {{ current_hash.sha256_hash }}
+        </div>
+        {% if current_hash.change_note %}
+        <div style="font-size:0.75rem; opacity:0.7; margin-top:4px;">
+          Note: {{ current_hash.change_note }}
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Known Baseline Hash from Document -->
+      <div class="alert mb-3" style="background:#2d1b00; color:#ffcc44; font-family:monospace; border:1px solid #ffcc44;">
+        <div style="font-size:0.75rem; opacity:0.7; margin-bottom:4px;">
+          📄 DOCUMENT BASELINE HASH (from uploaded ordinance record)
+        </div>
+        <div style="font-size:0.95rem; word-break:break-all; font-weight:700;">
+          f9488c4b9f4381867adcf6555cad7fa7e984374ceb2c7f1f2abb3f679578cf82
+        </div>
+        <div class="mt-2" style="font-size:0.8rem;">
+          {% if current_hash.sha256_hash == 'f9488c4b9f4381867adcf6555cad7fa7e984374ceb2c7f1f2abb3f679578cf82' %}
+            <span style="color:#00ff88;">✅ MATCH — Document integrity verified</span>
+          {% else %}
+            <span style="color:#ff6b6b;">⚠️ MISMATCH — Document has been modified from baseline</span>
+          {% endif %}
+        </div>
+      </div>
+      {% else %}
+      <div class="alert alert-warning">
+        ⚠️ No hash recorded yet. Save the ordinance text below to generate the first hash.
+      </div>
+      {% endif %}
+
+      <!-- Save Ordinance Text + Generate Hash -->
+      <div class="card border-secondary mb-3">
+        <div class="card-header bg-secondary text-white">
+          📝 Save Ordinance Text & Generate New Hash
+        </div>
+        <div class="card-body">
+          <form method="POST" action="{{ url_for('save_ordinance') }}">
+            <div class="mb-2">
+              <label class="form-label small fw-bold">Ordinance Text (paste full text to hash)</label>
+              <textarea name="ordinance_text" class="form-control"
+                rows="6"
+                placeholder="Paste the full ordinance text here to compute and log its SHA-256 fingerprint..."
+                style="font-family:monospace; font-size:0.8rem;">{{ settings.ordinance_text if settings and settings.ordinance_text else '' }}</textarea>
+            </div>
+            <div class="mb-2">
+              <input type="text" name="change_note" class="form-control form-control-sm"
+                placeholder="Change note (e.g. 'Added Section 7 language', 'Corrected typo in Section 3')"
+                value="">
+            </div>
+            <button type="submit" class="btn btn-dark btn-sm">
+              🔐 Save & Compute Hash
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Hash Change Log Table -->
+      <h6 class="fw-bold mb-2">📋 Hash Change Log (Last 20 Entries)</h6>
+      {% if hash_log %}
+      <div class="table-responsive">
+        <table class="table table-sm table-bordered" style="font-size:0.8rem; font-family:monospace;">
+          <thead style="background:#1a1a2e; color:#fff;">
+            <tr>
+              <th>#</th>
+              <th>SHA-256 Hash</th>
+              <th>Previous Hash</th>
+              <th>Changed By</th>
+              <th>Note</th>
+              <th>Timestamp</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for entry in hash_log %}
+            <tr {% if entry.is_current %}style="background:#e8f5e9;"{% endif %}>
+              <td>{{ entry.id }}</td>
+              <td style="word-break:break-all; max-width:200px;">
+                <span title="{{ entry.sha256_hash }}">
+                  {{ entry.sha256_hash[:16] }}...
+                </span>
+              </td>
+              <td style="word-break:break-all; max-width:150px;">
+                {% if entry.previous_hash %}
+                  <span title="{{ entry.previous_hash }}">
+                    {{ entry.previous_hash[:12] }}...
+                  </span>
+                {% else %}
+                  <span class="text-muted">Genesis</span>
+                {% endif %}
+              </td>
+              <td>{{ entry.changed_by or '—' }}</td>
+              <td>{{ entry.change_note or '—' }}</td>
+              <td>{{ entry.timestamp.strftime('%m/%d/%Y %H:%M') }}</td>
+              <td>
+                {% if entry.is_current %}
+                  <span class="badge bg-success">✅ Current</span>
+                {% else %}
+                  <span class="badge bg-secondary">Archived</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <p class="text-muted fst-italic">No hash records yet.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION C — VERIFIED SIGNERS TABLE
+  ═══════════════════════════════════════════════ -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-header" style="background:#8B0000; color:#fff;">
+      <h5 class="mb-0">✅ Verified Petition Signatures ({{ count }})</h5>
+      <small style="opacity:0.8;">
+        Enrolled members who have signed the initiative petition for Proposed Ordinance No. 2026-
+      </small>
+    </div>
+    <div class="card-body p-0">
+      {% if signers %}
+      <div class="table-responsive">
+        <table class="table table-striped table-hover mb-0">
+          <thead style="background:#f5e6e6;">
+            <tr>
+              <th>#</th>
+              <th>Full Name</th>
+              <th>Enrollment ID</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>IP Address</th>
+              <th>Signed At</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for signer in signers %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td><strong>{{ signer.full_name }}</strong></td>
+              <td><code>{{ signer.enrollment_id }}</code></td>
+              <td>{{ signer.email or '—' }}</td>
+              <td>{{ signer.phone or '—' }}</td>
+              <td><small class="text-muted">{{ signer.ip_address or '—' }}</small></td>
+              <td>
+                <small>{{ signer.timestamp.strftime('%b %d, %Y %I:%M %p') if signer.timestamp else '—' }}</small>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <div class="p-4 text-center text-muted fst-italic">
+          No verified signatures yet.
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION D — REJECTED DUPLICATE ATTEMPTS
+  ═══════════════════════════════════════════════ -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-header" style="background:#7b1c1c; color:#fff;">
+      <h5 class="mb-0">🚫 Rejected Duplicate Attempts ({{ duplicate_attempts | length }})</h5>
+      <small style="opacity:0.8;">
+        Submissions flagged and rejected — not counted toward the petition total
+      </small>
+    </div>
+    <div class="card-body p-0">
+      {% if duplicate_attempts %}
+      <div class="table-responsive">
+        <table class="table table-hover mb-0" style="font-size:0.9rem;">
+          <thead style="background:#fdecea;">
+            <tr>
+              <th>#</th>
+              <th>Full Name</th>
+              <th>Enrollment ID</th>
+              <th>Email</th>
+              <th>IP Address</th>
+              <th>Attempted At</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for attempt in duplicate_attempts %}
+            <tr style="background:#fff8f8;">
+              <td>{{ loop.index }}</td>
+              <td style="color:#8B0000;"><strong>{{ attempt.full_name }}</strong></td>
+              <td><code>{{ attempt.enrollment_id }}</code></td>
+              <td>{{ attempt.email or '—' }}</td>
+              <td><small class="text-muted">{{ attempt.ip_address or '—' }}</small></td>
+              <td>
+                <small>{{ attempt.timestamp.strftime('%b %d, %Y %I:%M %p') if attempt.timestamp else '—' }}</small>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <div class="p-4 text-center text-muted fst-italic">
+          No duplicate attempts recorded.
+        </div>
+      {% endif %}
+    </div>
   </div>
 
 </div>
-
-<!-- ======================== -->
-<!--    PROGRESS BAR          -->
-<!-- ======================== -->
-<div class="progress-bar-wrap">
-  <div class="progress-bar-fill"
-       style="width: {{ [((count / (settings.target_signatures or 1)) * 100) | int, 100] | min }}%;">
-    {{ [((count / (settings.target_signatures or 1)) * 100) | int, 100] | min }}%
-  </div>
-</div>
-
-<!-- ======================== -->
-<!--    RECENT SIGNERS        -->
-<!-- ======================== -->
-<h4>✅ Signers</h4>
-
-<table>
-  <thead>
-    <tr>
-      <th>#</th>
-      <th>Full Name</th>
-      <th>Enrollment ID</th>
-      <th>Email</th>
-      <th>Phone</th>
-      <th>IP Address</th>
-      <th>Signed At</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for s in signers %}
-    <tr>
-      <td>{{ loop.index }}</td>
-      <td>{{ s.full_name }}</td>
-      <td>{{ s.enrollment_id }}</td>
-      <td>{{ s.email or '—' }}</td>
-      <td>{{ s.phone or '—' }}</td>
-      <td>{{ s.ip_address or '—' }}</td>
-      <td>
-        {% if s.timestamp %}
-          {{ s.timestamp.strftime('%Y-%m-%d %H:%M') }}
-        {% else %}
-          —
-        {% endif %}
-      </td>
-    </tr>
-    {% else %}
-    <tr>
-      <td colspan="7" class="empty-row">No signatures recorded yet.</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-
-<!-- ======================== -->
-<!--   REJECTED DUPLICATES    -->
-<!-- ======================== -->
-<h4>🚫 Rejected Duplicate Attempts</h4>
-
-<table>
-  <thead>
-    <tr>
-      <th>#</th>
-      <th>Full Name</th>
-      <th>Enrollment ID</th>
-      <th>Email</th>
-      <th>IP Address</th>
-      <th>Attempted At</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for d in duplicate_attempts %}
-    <tr class="duplicate-row">
-      <td>{{ loop.index }}</td>
-      <td>{{ d.full_name }}</td>
-      <td>{{ d.enrollment_id }}</td>
-      <td>{{ d.email or '—' }}</td>
-      <td>{{ d.ip_address or '—' }}</td>
-      <td>
-        {% if d.timestamp %}
-          {{ d.timestamp.strftime('%Y-%m-%d %H:%M') }}
-        {% else %}
-          —
-        {% endif %}
-      </td>
-    </tr>
-    {% else %}
-    <tr>
-      <td colspan="6" class="empty-row">No duplicate attempts recorded.</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-
-<!-- ======================== -->
-<!--        STYLES            -->
-<!-- ======================== -->
-<style>
-  h2 { margin-bottom: 0.2rem; }
-
-  .subtitle {
-    color: #666;
-    font-style: italic;
-    margin-bottom: 1.5rem;
-  }
-
-  /* --- Stat Cards --- */
-  .stats-grid {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    margin-bottom: 1.5rem;
-  }
-
-  .stat-card {
-    background: #f0f4ff;
-    border-radius: 8px;
-    padding: 1rem 2rem;
-    text-align: center;
-    min-width: 150px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  }
-
-  .stat-card h3 {
-    font-size: 2rem;
-    margin: 0 0 0.25rem;
-  }
-
-  .stat-card p {
-    margin: 0;
-    color: #555;
-    font-size: 0.85rem;
-  }
-
-  .stat-card.rejected {
-    background: #fff0f0;
-    border-left: 4px solid #e74c3c;
-  }
-
-  /* --- Progress Bar --- */
-  .progress-bar-wrap {
-    background: #e0e0e0;
-    border-radius: 20px;
-    overflow: hidden;
-    height: 28px;
-    margin-bottom: 2rem;
-  }
-
-  .progress-bar-fill {
-    background: linear-gradient(90deg, #8B0000, #c0392b);
-    height: 100%;
-    color: white;
-    font-size: 0.8rem;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 2rem;
-    border-radius: 20px;
-    transition: width 0.5s ease;
-  }
-
-  /* --- Tables --- */
-  h4 {
-    margin: 1.5rem 0 0.5rem;
-    border-bottom: 2px solid #ddd;
-    padding-bottom: 0.3rem;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 2rem;
-    font-size: 0.9rem;
-  }
-
-  th, td {
-    padding: 0.55rem 0.9rem;
-    border: 1px solid #ddd;
-    text-align: left;
-  }
-
-  th {
-    background: #f5f5f5;
-    font-weight: 600;
-  }
-
-  tr:hover td {
-    background: #fafafa;
-  }
-
-  .duplicate-row td {
-    background: #fff5f5;
-    color: #922b21;
-  }
-
-  .duplicate-row:hover td {
-    background: #ffe0e0;
-  }
-
-  .empty-row {
-    text-align: center;
-    color: #999;
-    font-style: italic;
-    padding: 1rem;
-  }
-</style>
-
 {% endblock %}
 
