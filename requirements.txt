@@ -39,4 +39,5 @@ Flask-Limiter==3.8.0
 # hashlib  ← built-in
 # datetime ← built-in
 # json     ← built-in
+Flask-Mail==0.9.1
 
