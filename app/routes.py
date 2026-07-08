@@ -1,15 +1,16 @@
 import os
-from flask import Blueprint, render_template, redirect, url_for, flash, current_app, jsonify
+from flask import Blueprint, render_template, redirect, url_for, flash, current_app, jsonify, send_from_directory, make_code
 from werkzeug.utils import secure_filename
 from app import db
 from app.models import SiteSettings, PetitionCommitteeMember, Signer, DocumentHashLog
 from app.forms import SignatureForm
-# 1. FIXED: Removed 'verify_content_matches_hash' from the import list
 from app.utils import compute_sha256, get_current_hash
 
+# ── BLUEPRINT DECLARATIONS ───────────────────────────────────────────
 main_bp = Blueprint('main_bp', __name__)
 admin_bp = Blueprint('admin_bp', __name__)
 
+# ── MAIN BLUEPRINT PATHS (Unified GET & POST) ──────────────────────────
 @main_bp.route('/petition', methods=['GET', 'POST'])
 def petition():
     form = SignatureForm()
@@ -69,13 +70,10 @@ def petition():
     goal              = settings.target_signatures if settings else 1000
     current_hash      = compute_sha256(ordinance_text) if ordinance_text else "—"
 
-    # 2. FIXED: Changed the verification logic to use a direct string comparison 
-    # instead of calling the missing utility function.
     _latest    = get_current_hash(DocumentHashLog) if 'DocumentHashLog' in globals() else None
     
     hash_match = False
     if _latest and ordinance_text:
-        # Direct string comparison between your calculated hash and the database log hash
         hash_match = (current_hash == _latest.get("sha256_hash"))
 
     start_date = (
@@ -109,4 +107,30 @@ def petition():
         links             = external_links,
         home_summary      = home_summary
     )
+
+# ── ADDITIONAL LINK UTILITIES (Fixed the 404 targets) ─────────────────
+
+@main_bp.route('/petition/print')
+def print_ordinance():
+    settings = SiteSettings.query.first()
+    ordinance_text = settings.ordinance_text if settings else ""
+    return render_template('print.html', ordinance_text=ordinance_text)
+
+@main_bp.route('/petition/download-pdf')
+def download_ordinance_pdf():
+    # Looks for a pre-generated file named ordinance.pdf in your app path
+    pdf_dir = os.path.join(current_app.root_path, 'static', 'docs')
+    try:
+        return send_from_directory(pdf_dir, 'ordinance.pdf', as_attachment=True)
+    except Exception:
+        flash("The official document PDF version is currently being generated. Please print or review via web text view.", "warning")
+        return redirect(url_for('main_bp.petition'))
+
+
+# ── ADMIN BLUEPRINT PATHS ───────────────────────────────────────────
+@admin_bp.route('/admin/dashboard')
+def dashboard():
+    settings = SiteSettings.query.first()
+    signers = Signer.query.order_by(Signer.signed_at.desc()).all()
+    return render_template('admin/dashboard.html', settings=settings, signers=signers)
 
