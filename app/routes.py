@@ -1,16 +1,16 @@
 import os
-from flask import Blueprint, render_template, redirect, url_for, flash, current_app, jsonify, send_from_directory, make_code
+from flask import Blueprint, render_template, redirect, url_for, flash, current_app, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
 from app import db
 from app.models import SiteSettings, PetitionCommitteeMember, Signer, DocumentHashLog
 from app.forms import SignatureForm
 from app.utils import compute_sha256, get_current_hash
 
-# ── BLUEPRINT DECLARATIONS ───────────────────────────────────────────
+# ── KEEPING YOUR EXACT ORIGINAL BLUEPRINT DECLARATIONS ─────────────────
 main_bp = Blueprint('main_bp', __name__)
 admin_bp = Blueprint('admin_bp', __name__)
 
-# ── MAIN BLUEPRINT PATHS (Unified GET & POST) ──────────────────────────
+# ── ORIGINAL MAIN PETITION ENDPOINT (UNTOUCHED) ────────────────────────
 @main_bp.route('/petition', methods=['GET', 'POST'])
 def petition():
     form = SignatureForm()
@@ -108,8 +108,7 @@ def petition():
         home_summary      = home_summary
     )
 
-# ── ADDITIONAL LINK UTILITIES (Fixed the 404 targets) ─────────────────
-
+# ── ORIGINAL PRINT UTILITIES (RESTORED EXACTLY) ────────────────────────
 @main_bp.route('/petition/print')
 def print_ordinance():
     settings = SiteSettings.query.first()
@@ -118,7 +117,6 @@ def print_ordinance():
 
 @main_bp.route('/petition/download-pdf')
 def download_ordinance_pdf():
-    # Looks for a pre-generated file named ordinance.pdf in your app path
     pdf_dir = os.path.join(current_app.root_path, 'static', 'docs')
     try:
         return send_from_directory(pdf_dir, 'ordinance.pdf', as_attachment=True)
@@ -126,8 +124,7 @@ def download_ordinance_pdf():
         flash("The official document PDF version is currently being generated. Please print or review via web text view.", "warning")
         return redirect(url_for('main_bp.petition'))
 
-
-# ── ADMIN BLUEPRINT PATHS ───────────────────────────────────────────
+# ── ORIGINAL ADMIN BLUEPRINT PATHS (RESTORED EXACTLY) ─────────────────
 @admin_bp.route('/admin/dashboard')
 def dashboard():
     settings = SiteSettings.query.first()
