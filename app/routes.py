@@ -4,7 +4,7 @@ from flask import (
 )
 from app.models import db, SiteSettings, DocumentHashLog, \
                        PetitionCommitteeMember, Signer
-from utils.hash_utils import (
+from app.utils.hash_utils import (
     compute_hash, log_hash, get_current_hash,
     get_baseline_hash, hash_matches_latest_log,
     verify_chain_integrity, get_hash_log
