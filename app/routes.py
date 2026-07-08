@@ -9,7 +9,6 @@ from app.utils.hash_utils import (
     compute_sha256,
     log_document_hash,
     get_current_hash,
-    get_baseline_hash,
     get_hash_history,
     verify_chain_integrity,
     verify_content_matches_hash,
@@ -20,9 +19,12 @@ import datetime
 main_bp  = Blueprint('main_bp',  __name__)
 admin_bp = Blueprint('admin_bp', __name__)
 
+
+# ── Root Redirect ──────────────────────────────────────────────
 @main_bp.route('/')
 def index():
-    return render_template('index.html')
+    return redirect(url_for('main_bp.petition'))
+
 
 # ── Petition Public Page ───────────────────────────────────────
 @main_bp.route('/petition')
@@ -32,23 +34,21 @@ def petition():
     committee_members = PetitionCommitteeMember.query.order_by(
         PetitionCommitteeMember.slot
     ).all()
-    recent_signers    = Signer.query.order_by(
-        Signer.signed_at.desc()
-    ).limit(10).all()
+    recent_signers    = Signer.query.order_by(Signer.signed_at.desc()).limit(10).all()
     total_signatures  = Signer.query.count()
-    goal              = settings.signature_goal if settings else 1000
+    goal              = settings.target_signatures if settings else 1000
+    current_hash      = compute_sha256(ordinance_text) if ordinance_text else "—"
 
-    current_hash = compute_sha256(ordinance_text) if ordinance_text else "—"
-
-    # ── hash_match: compare live text against latest logged hash ──
-    _latest   = get_current_hash(DocumentHashLog)
+    _latest    = get_current_hash(DocumentHashLog)
     hash_match = (
-        verify_content_matches_hash(ordinance_text, _latest["hash_value"])
+        verify_content_matches_hash(ordinance_text, _latest["sha256_hash"])
         if _latest and ordinance_text else False
     )
 
-    start_date = settings.petition_start_date.strftime('%B %d, %Y') \
+    start_date = (
+        settings.petition_start_date.strftime('%B %d, %Y')
         if settings and settings.petition_start_date else "—"
+    )
 
     return render_template(
         'petition.html',
@@ -71,15 +71,14 @@ def print_ordinance():
     committee_members = PetitionCommitteeMember.query.order_by(
         PetitionCommitteeMember.slot
     ).all()
-
-    current_hash = compute_sha256(ordinance_text) if ordinance_text else "—"
-
-    latest_log     = DocumentHashLog.query.order_by(
-        DocumentHashLog.created_at.desc()
+    current_hash  = compute_sha256(ordinance_text) if ordinance_text else "—"
+    latest_log    = DocumentHashLog.query.order_by(
+        DocumentHashLog.timestamp.desc()
     ).first()
-    hash_timestamp = latest_log.created_at.strftime(
-        '%B %d, %Y at %I:%M %p UTC'
-    ) if latest_log else "—"
+    hash_timestamp = (
+        latest_log.timestamp.strftime('%B %d, %Y at %I:%M %p UTC')
+        if latest_log else "—"
+    )
 
     return render_template(
         'ordinance_print.html',
@@ -102,15 +101,14 @@ def download_ordinance_pdf():
         committee_members = PetitionCommitteeMember.query.order_by(
             PetitionCommitteeMember.slot
         ).all()
-
-        current_hash = compute_sha256(ordinance_text) if ordinance_text else "—"
-
-        latest_log     = DocumentHashLog.query.order_by(
-            DocumentHashLog.created_at.desc()
+        current_hash  = compute_sha256(ordinance_text) if ordinance_text else "—"
+        latest_log    = DocumentHashLog.query.order_by(
+            DocumentHashLog.timestamp.desc()
         ).first()
-        hash_timestamp = latest_log.created_at.strftime(
-            '%B %d, %Y at %I:%M %p UTC'
-        ) if latest_log else "—"
+        hash_timestamp = (
+            latest_log.timestamp.strftime('%B %d, %Y at %I:%M %p UTC')
+            if latest_log else "—"
+        )
 
         html_content = render_template(
             'ordinance_print.html',
@@ -170,7 +168,7 @@ def save_ordinance():
     )
 
     flash(
-        f"✅ Ordinance saved and hash logged. SHA-256: {entry.hash_value[:16]}...",
+        f"✅ Ordinance saved and hash logged. SHA-256: {entry.sha256_hash[:16]}...",
         "success"
     )
     return redirect(url_for('admin_bp.dashboard'))
@@ -181,7 +179,6 @@ def save_ordinance():
 @login_required
 def verify_chain():
     result = verify_chain_integrity(DocumentHashLog)
-
     if result['valid']:
         flash(
             f"✅ Hash chain verified. {result['checked']} entries — chain is unbroken.",
@@ -199,12 +196,12 @@ def verify_chain():
 # ── Sign Petition ──────────────────────────────────────────────
 @main_bp.route('/petition/sign', methods=['POST'])
 def sign_petition():
-    first_name    = request.form.get('first_name',    '').strip()
-    last_name     = request.form.get('last_name',     '').strip()
+    first_name    = request.form.get('first_name', '').strip()
+    last_name     = request.form.get('last_name', '').strip()
     enrollment_id = request.form.get('enrollment_id', '').strip()
-    city          = request.form.get('city',          '').strip()
-    email         = request.form.get('email',         '').strip()
-    phone         = request.form.get('phone',         '').strip()
+    city          = request.form.get('city', '').strip()
+    email         = request.form.get('email', '').strip()
+    phone         = request.form.get('phone', '').strip()
     affirm        = request.form.get('affirm')
 
     if not all([first_name, last_name, enrollment_id]):
