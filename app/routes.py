@@ -35,6 +35,7 @@ def index():
 # ── Petition Public Page ───────────────────────────────────────
 @main_bp.route('/petition')
 def petition():
+    form = SignatureForm()
     settings          = SiteSettings.query.first()
     ordinance_text    = settings.ordinance_text if settings else ""
     committee_members = PetitionCommitteeMember.query.order_by(
@@ -58,6 +59,7 @@ def petition():
 
     return render_template(
         'petition.html',
+        form              = form,
         settings          = settings,
         ordinance_text    = ordinance_text,
         committee_members = committee_members,
