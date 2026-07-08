@@ -6,12 +6,12 @@ from app.models import SiteSettings, PetitionCommitteeMember, Signer, DocumentHa
 from app.forms import SignatureForm
 from app.utils import compute_sha256, get_current_hash
 
-# ── KEEPING YOUR EXACT ORIGINAL BLUEPRINT DECLARATIONS ─────────────────
+# ── BLUEPRINT DECLARATIONS ───────────────────────────────────────────
 main_bp = Blueprint('main_bp', __name__)
 admin_bp = Blueprint('admin_bp', __name__)
 
-# ── ORIGINAL MAIN PETITION ENDPOINT (UNTOUCHED) ────────────────────────
-@main_bp.route('/petition', methods=['GET', 'POST'])
+# ── FIXED ROOT ROUTE (Changed from '/petition' to '/') ───────────────
+@main_bp.route('/', methods=['GET', 'POST'])
 def petition():
     form = SignatureForm()
 
@@ -108,7 +108,7 @@ def petition():
         home_summary      = home_summary
     )
 
-# ── ORIGINAL PRINT UTILITIES (RESTORED EXACTLY) ────────────────────────
+# ── ORIGINAL PRINT UTILITIES ──────────────────────────────────────────
 @main_bp.route('/petition/print')
 def print_ordinance():
     settings = SiteSettings.query.first()
@@ -124,7 +124,7 @@ def download_ordinance_pdf():
         flash("The official document PDF version is currently being generated. Please print or review via web text view.", "warning")
         return redirect(url_for('main_bp.petition'))
 
-# ── ORIGINAL ADMIN BLUEPRINT PATHS (RESTORED EXACTLY) ─────────────────
+# ── ORIGINAL ADMIN BLUEPRINT PATHS ────────────────────────────────────
 @admin_bp.route('/admin/dashboard')
 def dashboard():
     settings = SiteSettings.query.first()
