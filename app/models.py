@@ -88,34 +88,3 @@ class DocumentHashLog(db.Model):
         db.session.commit()
         return new_log
 
-class DocumentHashLog(db.Model):
-    __tablename__ = 'document_hash_log'
-
-    id            = db.Column(db.Integer, primary_key=True)
-    hash_value    = db.Column(db.String(64), nullable=False)
-    previous_hash = db.Column(db.String(64), nullable=True)
-    change_note   = db.Column(db.String(500), nullable=True)
-    changed_by    = db.Column(db.String(200), nullable=True)
-    text_length   = db.Column(db.Integer, nullable=True)
-    created_at    = db.Column(
-        db.DateTime,
-        default=datetime.datetime.utcnow,
-        nullable=False
-    )
-
-    def __repr__(self):
-        return (
-            f"<HashLog id={self.id} "
-            f"hash={self.hash_value[:12]}... "
-            f"at={self.created_at}>"
-        )
-
-    @property
-    def short_hash(self):
-        return self.hash_value[:16] + "..."
-
-    @property
-    def chain_link(self):
-        """Returns a visual chain link indicator."""
-        return "🔗" if self.previous_hash else "🔑"
-
