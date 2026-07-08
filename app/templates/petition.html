@@ -322,115 +322,17 @@
     white-space: nowrap;
   }
 
-  /* ── Sign Form ── */
-  .sign-section {
-    background: #fff;
-    border: 2px solid #1a3a5c;
+  /* ── Refined Scope Box ── */
+  .refined-summary-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
     border-radius: 8px;
-    padding: 24px 26px;
-    margin-bottom: 24px;
-    box-shadow: 0 4px 16px rgba(26,58,92,0.10);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    overflow: hidden;
   }
-
-  .sign-section h3 {
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: #1a3a5c;
-    margin-bottom: 6px;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-  }
-
-  .sign-section .sign-sub {
-    font-size: 0.85rem;
-    color: #555;
-    margin-bottom: 20px;
-    line-height: 1.6;
-  }
-
-  .form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    margin-bottom: 14px;
-  }
-
-  @media (max-width: 600px) {
-    .form-grid { grid-template-columns: 1fr; }
-  }
-
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .form-group label {
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: #1a3a5c;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-  }
-
-  .form-group input {
-    border: 1px solid #b0c4de;
-    border-radius: 4px;
-    padding: 9px 12px;
-    font-size: 0.92rem;
-    color: #1a1a1a;
-    transition: border-color 0.2s;
-    font-family: inherit;
-  }
-
-  .form-group input:focus {
-    outline: none;
-    border-color: #1a3a5c;
-    box-shadow: 0 0 0 3px rgba(26,58,92,0.12);
-  }
-
-  .affirmation-check {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    background: #f0f4f8;
-    border: 1px solid #c0d0e8;
-    border-radius: 5px;
-    padding: 12px 14px;
-    margin-bottom: 16px;
-    font-size: 0.88rem;
-    color: #333;
-    line-height: 1.6;
-    cursor: pointer;
-  }
-
-  .affirmation-check input[type="checkbox"] {
-    margin-top: 3px;
-    width: 16px;
-    height: 16px;
-    flex-shrink: 0;
-    accent-color: #1a3a5c;
-  }
-
-  .btn-sign {
-    width: 100%;
-    background: linear-gradient(135deg, #1a3a5c, #2e6da4);
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    padding: 13px;
-    font-size: 1rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    cursor: pointer;
-    transition: opacity 0.2s;
-    text-transform: uppercase;
-  }
-
-  .btn-sign:hover { opacity: 0.9; }
-  .btn-sign:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  .refined-sidebar-accent {
+    width: 6px;
+    background-color: #1a3a5c;
   }
 
   /* ── Recent Signers ── */
@@ -487,15 +389,11 @@
   .signer-name { font-weight: 600; }
   .signer-city { color: #777; font-size: 0.82rem; }
   .signer-date { margin-left: auto; color: #999; font-size: 0.78rem; }
-
 </style>
 {% endblock %}
 
 {% block content %}
 
-<!-- ══════════════════════════════════════════════════════ -->
-<!--                INITIATIVE BANNER                       -->
-<!-- ══════════════════════════════════════════════════════ -->
 <div class="initiative-banner">
   <div class="initiative-badge">⚖️ Article V — Citizen Initiative</div>
   <div class="ordinance-num">PROPOSED INITIATIVE ORDINANCE NO. 2026-PI</div>
@@ -518,6 +416,29 @@
     Membership through the constitutionally prescribed initiative process.
   </div>
 
+  <!-- REFINED SUMMARY & ACTIONS CARD -->
+  <div class="refined-summary-card d-flex mb-4">
+    <div class="refined-sidebar-accent"></div>
+    <div class="card-body p-4">
+        <h4 class="font-weight-bold mb-2" style="color: #1a3a5c; font-size: 1.2rem; letter-spacing: 0.02em;">Petition Context & Scope</h4>
+        <p class="text-secondary mb-4" style="font-size: 0.95rem; line-height: 1.6; color: #4a5568;">{{ home_summary }}</p>
+        
+        <div class="pt-3 border-top d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+                <span class="text-muted font-weight-bold small text-uppercase mr-2" style="font-size: 0.75rem; letter-spacing: 0.05em;">Resources:</span>
+                <a href="{{ links.vote_no }}" target="_blank" class="btn btn-sm btn-danger px-3 font-weight-bold shadow-sm">Vote No, Demand Better</a>
+                <a href="{{ links.lumbee_docs }}" target="_blank" class="btn btn-sm btn-outline-secondary px-3">Lumbee Constitution</a>
+                <a href="{{ links.ordinances }}" target="_blank" class="btn btn-sm btn-outline-secondary px-3">Tribal Ordinances</a>
+            </div>
+
+            <!-- MODAL BUTTON TRIGGER -->
+            <button type="button" class="btn btn-primary px-4 font-weight-bold shadow-sm" data-toggle="modal" data-target="#signPetitionModal" style="background-color: #1a3a5c; border: none;">
+                ✍️ Sign Petition
+            </button>
+        </div>
+    </div>
+  </div>
+
   <!-- ARTICLE V BADGE -->
   <div class="article-v-badge">
     <div class="article-v-icon">📜</div>
@@ -526,7 +447,7 @@
       The Constitution of the Lumbee Tribe reserves to the General Membership
       the power to initiate ordinances affecting fundamental rights, including
       any ordinance authorizing gaming. Your signature supports placing this
-      measure before all enrolled members for a vote.
+measure before all enrolled members for a vote.
     </div>
   </div>
 
@@ -538,9 +459,7 @@
       <span>{{ pct }}% of goal</span>
     </div>
     <div class="progress-bar-outer">
-      <div class="progress-bar-inner"
-           style="width: {{ [pct, 100] | min }}%">
-      </div>
+      <div class="progress-bar-inner" style="width: {{ [pct, 100] | min }}%"></div>
     </div>
     <div class="progress-meta">
       <span>✍️ <strong>{{ total_signatures }}</strong> signatures collected</span>
@@ -553,13 +472,11 @@
   <div class="committee-section">
     <h3>📋 Petition Committee — Article V</h3>
     <div class="committee-sub">
-      Three enrolled members responsible for circulating,
-      verifying, and submitting this initiative petition.
+      Three enrolled members responsible for circulating, verifying, and submitting this initiative petition.
     </div>
     <div class="committee-grid">
       {% for member in committee_members %}
-      <div class="committee-card
-        {{ 'unfilled' if not member.full_name or member.full_name.startswith('[') }}">
+      <div class="committee-card {{ 'unfilled' if not member.full_name or member.full_name.startswith('[') }}">
         <div class="member-num">Committee Member {{ loop.index }}</div>
         <div class="member-name">
           {% if member.full_name and not member.full_name.startswith('[') %}
@@ -588,9 +505,7 @@
     {% if hash_match %}
     <span class="hash-status-ok">✓ VERIFIED</span>
     {% else %}
-    <span style="margin-left:auto; background:#5c1a1a; color:#ffb3b3;
-                 padding:3px 10px; border-radius:100px; font-size:0.75rem;
-                 font-weight:700; white-space:nowrap;">
+    <span style="margin-left:auto; background:#5c1a1a; color:#ffb3b3; padding:3px 10px; border-radius:100px; font-size:0.75rem; font-weight:700; white-space:nowrap;">
       ⚠️ MISMATCH
     </span>
     {% endif %}
@@ -601,117 +516,16 @@
     <h3>📄 Proposed Ordinance Text</h3>
     <div class="ordinance-scroll">{{ ordinance_text }}</div>
     <div class="ordinance-actions">
-      <a href="{{ url_for('main_bp.print_ordinance') }}"
-         target="_blank"
-         class="btn-download">
+      <a href="{{ url_for('main_bp.print_ordinance') }}" target="_blank" class="btn-download">
         🖨️ View / Print Full Ordinance
       </a>
-      <a href="{{ url_for('main_bp.download_ordinance_pdf') }}"
-         class="btn-download">
+      <a href="{{ url_for('main_bp.download_ordinance_pdf') }}" class="btn-download">
         📥 Download PDF
       </a>
       <button onclick="window.print()" class="btn-print">
         🖨️ Print This Page
       </button>
     </div>
-  </div>
-
-  <!-- SIGN THE PETITION -->
-  <div class="sign-section">
-    <h3>✍️ Sign the Initiative Petition</h3>
-    <div class="sign-sub">
-      By signing, you affirm that you are an enrolled member of the Lumbee
-      Tribe of North Carolina and support placing
-      <strong>Proposed Initiative Ordinance No. 2026-PI</strong> before
-      the General Membership for a vote pursuant to Article V.
-    </div>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% for category, message in messages %}
-      <div class="alert alert-{{ category }} mb-3" style="padding:10px 14px;
-           border-radius:5px; font-size:0.9rem;
-           background:{{ '#d4edda' if category == 'success' else '#f8d7da' }};
-           color:{{ '#155724' if category == 'success' else '#721c24' }};
-           border:1px solid {{ '#c3e6cb' if category == 'success' else '#f5c6cb' }}">
-        {{ message }}
-      </div>
-      {% endfor %}
-    {% endwith %}
-        
-    <!-- Summary Block and External Resources -->
-    <div class="card mb-4 shadow-sm border-0 bg-light">
-        <div class="card-body">
-        <h4 class="card-title text-dark">Petition Overview & Context</h4>
-        <p class="card-text text-muted font-italic">{{ home_summary }}</p>
-        
-        <hr class="my-3">
-        
-        <h5 class="h6 text-uppercase tracking-wider font-weight-bold mb-3">Official Tribal Resources & Campaigns</h5>
-        <div class="d-flex flex-wrap gap-2">
-            <a href="{{ links.vote_no }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-danger mr-2">
-            <i class="fas fa-external-link-alt"></i> Vote No, Demand Better Campaign
-            </a>
-            <a href="{{ links.lumbee_docs }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary mr-2">
-            <i class="fas fa-book"></i> Lumbee Constitution & History
-            </a>
-            <a href="{{ links.ordinances }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary">
-            <i class="fas fa-gavel"></i> Tribal Ordinances & Resolutions
-            </a>
-        </div>
-        </div>
-    </div>
-
-    <!-- Inside petition.html and sign.html -->
-    <form method="POST" action="{{ url_for('main_bp.petition') }}" id="signForm" enctype="multipart/form-data">
-      {{ form.hidden_tag() if form.hidden_tag is defined }}
-
-      <div class="form-grid">
-        <div class="form-group">
-          <label for="first_name">First Name *</label>
-          <input type="text" id="first_name" name="first_name"
-                 placeholder="First name" required>
-        </div>
-        <div class="form-group">
-          <label for="last_name">Last Name *</label>
-          <input type="text" id="last_name" name="last_name"
-                 placeholder="Last name" required>
-        </div>
-        <div class="form-group">
-          <label for="enrollment_id">Enrollment ID *</label>
-          <input type="text" id="enrollment_id" name="enrollment_id"
-                 placeholder="Lumbee enrollment number" required>
-        </div>
-        <div class="form-group">
-          <label for="city">City / Community</label>
-          <input type="text" id="city" name="city"
-                 placeholder="City or community">
-        </div>
-        <div class="form-group">
-          <label for="email">Email Address</label>
-          <input type="email" id="email" name="email"
-                 placeholder="your@email.com">
-        </div>
-        <div class="form-group">
-          <label for="phone">Phone (Optional)</label>
-          <input type="tel" id="phone" name="phone"
-                 placeholder="(910) 000-0000">
-        </div>
-      </div>
-
-      <label class="affirmation-check">
-        <input type="checkbox" name="affirm" id="affirmCheck" required>
-        <span>
-          I affirm that I am an enrolled member of the Lumbee Tribe of North
-          Carolina, I have had the opportunity to read this Proposed Ordinance,
-          I support placing it before the General Membership for a vote, and
-          I have not previously signed this petition.
-        </span>
-      </label>
-
-      <button type="submit" class="btn-sign" id="signBtn" disabled>
-        ✍️ SIGN THE INITIATIVE PETITION
-      </button>
-    </form>
   </div>
 
   <!-- RECENT SIGNERS -->
@@ -737,14 +551,139 @@
     </ul>
   </div>
 
-</div><!-- /container -->
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--             MODAL DIALOG CONTAINER CONTAINER           -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="modal fade" id="signPetitionModal" tabindex="-1" role="dialog" aria-labelledby="signModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title font-weight-bold" id="signModalLabel">Sign Official Petition</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="asyncSignForm" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                <div class="modal-body p-4">
+
+                    <!-- Client Side Async Alert Window -->
+                    <div id="modalAlert" class="alert d-none"></div>
+
+                    <!-- MANDATORY ORDINANCE READING CHECKBOX -->
+                    <div class="p-3 mb-3 rounded border" style="background-color: #fffbeb; border-color: #fde68a;">
+                        <div class="form-check d-flex align-items-start" style="gap: 10px;">
+                            <input type="checkbox" class="form-check-input mt-1" id="affirmCheck" name="read_ordinance_check">
+                            <label class="form-check-label text-dark font-weight-bold" for="affirmCheck" style="font-size: 0.92rem; line-height: 1.5; cursor: pointer;">
+                                I certify that I have read the complete Lumbee Constitution text and accompanying Tribal Ordinances displayed on this platform.
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- STANDARD FIELD PROCESSING LAYOUT -->
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="font-weight-bold small text-uppercase" style="color:#1a3a5c;">{{ form.full_name.label }} *</label>
+                            {{ form.full_name(class="form-control", placeholder="First & Last Name", required=True) }}
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="font-weight-bold small text-uppercase" style="color:#1a3a5c;">{{ form.enrollment_id.label }} *</label>
+                            {{ form.enrollment_id(class="form-control", placeholder="Lumbee Enrollment ID", required=True) }}
+                        </div>
+                    </div>
+
+                    <div class="form-group my-3">
+                        <label class="font-weight-bold small text-uppercase" style="color:#1a3a5c;">{{ form.id_upload.label }} *</label>
+                        <div class="custom-file">
+                            {{ form.id_upload(class="form-control-file", required=True) }}
+                        </div>
+                        <small class="text-muted d-block mt-1">Photo verification of your Lumbee Membership card is mandatory to prevent fraudulent submissions.</small>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="font-weight-bold small text-uppercase" style="color:#1a3a5c;">{{ form.email.label }} *</label>
+                            {{ form.email(class="form-control", placeholder="name@domain.com", required=True) }}
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="font-weight-bold small text-uppercase" style="color:#1a3a5c;">{{ form.phone.label }}</label>
+                            {{ form.phone(class="form-control", placeholder="(910) 555-0100") }}
+                        </div>
+                    </div>
+
+                    <div class="form-check mt-3 d-flex align-items-center" style="gap: 10px;">
+                        {{ form.legal_consent(class="form-check-input", id="legalConsentCheck", required=True) }}
+                        <label class="form-check-label text-secondary small font-weight-bold" for="legalConsentCheck" style="cursor: pointer;">
+                            I provide legal consent to attach my signature verification record to this public registry log.
+                        </label>
+                    </div>
+
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary btn-sm font-weight-bold px-3" data-dismiss="modal">Cancel</button>
+                    <button type="submit" id="signBtn" class="btn btn-success btn-sm px-4 font-weight-bold" disabled>✍️ Confirm & Sign</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <script>
-  // Enable sign button only when affirmation is checked
+  // Dynamic validation switch tracking checkbox changes
   const affirmCheck = document.getElementById('affirmCheck');
   const signBtn     = document.getElementById('signBtn');
+  
   affirmCheck.addEventListener('change', function() {
     signBtn.disabled = !this.checked;
+  });
+
+  // Handle Form Submission via Fetch/AJAX
+  document.getElementById('asyncSignForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const alertBox = document.getElementById('modalAlert');
+    alertBox.classList.add('d-none');
+    
+    if (!affirmCheck.checked) {
+        alertBox.className = "alert alert-danger";
+        alertBox.textContent = "Error: You must check the confirmation box stating you have read the Lumbee constitution and ordinances.";
+        alertBox.classList.remove('d-none');
+        return;
+    }
+
+    const formData = new FormData(this);
+    
+    // Disable button to prevent double-click submissions
+    signBtn.disabled = true;
+    signBtn.textContent = "Processing Signature...";
+    
+    fetch("{{ url_for('main_bp.petition') }}", {
+        method: "POST",
+        body: formData,
+        headers: {
+            "X-Requested-With": "XMLHttpRequest"
+        }
+    })
+    .then(async response => {
+        const data = await response.json();
+        if (!response.ok) throw data;
+        
+        alertBox.className = "alert alert-success";
+        alertBox.textContent = data.message;
+        alertBox.classList.remove('d-none');
+        setTimeout(() => { window.location.reload(); }, 1500);
+    })
+    .catch(err => {
+        alertBox.className = "alert alert-danger";
+        alertBox.textContent = err.message || "An unexpected error occurred during signing.";
+        alertBox.classList.remove('d-none');
+        
+        // Reset execution switch
+        signBtn.disabled = false;
+        signBtn.textContent = "✍️ Confirm & Sign";
+    });
   });
 </script>
 
