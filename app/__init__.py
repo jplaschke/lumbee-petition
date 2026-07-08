@@ -59,8 +59,9 @@ def create_app():
     login_manager.login_view = 'main.login'
 
     # ── Register Blueprints ────────────────────────────────────────────
-    from app.routes import main
-    app.register_blueprint(main)
+    from app.routes import main_bp, admin_bp
+    app.register_blueprint(main_bp)
+    app.register_blueprint(admin_bp)
 
     # ── Create Tables & Seed Defaults ─────────────────────────────────
     with app.app_context():
