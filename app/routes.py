@@ -1,9 +1,9 @@
 from flask import (
-    render_template, request, redirect,
+    Blueprint, render_template, request, redirect,
     url_for, flash, Response
 )
-from models import db, SiteSettings, DocumentHashLog, \
-                   PetitionCommitteeMember, Signer
+from app.models import db, SiteSettings, DocumentHashLog, \
+                       PetitionCommitteeMember, Signer
 from utils.hash_utils import (
     compute_hash, log_hash, get_current_hash,
     get_baseline_hash, hash_matches_latest_log,
@@ -11,24 +11,27 @@ from utils.hash_utils import (
 )
 import datetime
 
+# ── Define Blueprints ──────────────────────────────────────────
+main_bp  = Blueprint('main_bp',  __name__)
+admin_bp = Blueprint('admin_bp', __name__)
 
 # ── Petition Public Page ───────────────────────────────────────
-@app.route('/petition')
+@main_bp.route('/petition')
 def petition():
-    settings         = SiteSettings.query.first()
-    ordinance_text   = settings.ordinance_text if settings else ""
+    settings          = SiteSettings.query.first()
+    ordinance_text    = settings.ordinance_text if settings else ""
     committee_members = PetitionCommitteeMember.query.order_by(
         PetitionCommitteeMember.slot_number
     ).all()
-    recent_signers   = Signer.query.order_by(
+    recent_signers    = Signer.query.order_by(
         Signer.signed_at.desc()
     ).limit(10).all()
-    total_signatures = Signer.query.count()
-    goal             = settings.signature_goal if settings else 1000
-    current_hash     = compute_hash(ordinance_text) if ordinance_text else "—"
-    hash_match       = hash_matches_latest_log()
-    start_date       = settings.petition_start_date.strftime('%B %d, %Y') \
-                       if settings and settings.petition_start_date else "—"
+    total_signatures  = Signer.query.count()
+    goal              = settings.signature_goal if settings else 1000
+    current_hash      = compute_hash(ordinance_text) if ordinance_text else "—"
+    hash_match        = hash_matches_latest_log()
+    start_date        = settings.petition_start_date.strftime('%B %d, %Y') \
+                        if settings and settings.petition_start_date else "—"
 
     return render_template(
         'petition.html',
@@ -42,9 +45,8 @@ def petition():
         start_date        = start_date
     )
 
-
 # ── Print / PDF View ───────────────────────────────────────────
-@app.route('/ordinance/print')
+@main_bp.route('/ordinance/print')
 def print_ordinance():
     settings          = SiteSettings.query.first()
     ordinance_text    = settings.ordinance_text if settings else ""
@@ -67,17 +69,11 @@ def print_ordinance():
         hash_timestamp    = hash_timestamp
     )
 
-
 # ── PDF Download ───────────────────────────────────────────────
-@app.route('/ordinance/download-pdf')
+@main_bp.route('/ordinance/download-pdf')
 def download_ordinance_pdf():
-    """
-    Generates a PDF using WeasyPrint and streams it as a download.
-    Requires: pip install weasyprint
-    """
     try:
-        from weasyprint import HTML, CSS
-        from flask import current_app
+        from weasyprint import HTML
         import io
 
         settings          = SiteSettings.query.first()
@@ -100,7 +96,6 @@ def download_ordinance_pdf():
             current_hash      = current_hash,
             hash_timestamp    = hash_timestamp
         )
-
         pdf_bytes = HTML(
             string   = html_content,
             base_url = request.host_url
@@ -110,27 +105,18 @@ def download_ordinance_pdf():
             f"Proposed_Initiative_Ordinance_2026-PI_"
             f"{datetime.date.today().strftime('%Y%m%d')}.pdf"
         )
-
         return Response(
             pdf_bytes,
-            mimetype    = 'application/pdf',
-            headers     = {
-                'Content-Disposition':
-                    f'attachment; filename="{filename}"'
-            }
+            mimetype = 'application/pdf',
+            headers  = {'Content-Disposition': f'attachment; filename="{filename}"'}
         )
 
     except ImportError:
-        flash(
-            "PDF generation requires WeasyPrint. "
-            "Install it with: pip install weasyprint",
-            "warning"
-        )
-        return redirect(url_for('print_ordinance'))
-
+        flash("PDF generation requires WeasyPrint.", "warning")
+        return redirect(url_for('main_bp.print_ordinance'))
 
 # ── Save Ordinance + Auto-Hash ─────────────────────────────────
-@app.route('/dashboard/save-ordinance', methods=['POST'])
+@admin_bp.route('/dashboard/save-ordinance', methods=['POST'])
 def save_ordinance():
     new_text    = request.form.get('ordinance_text', '').strip()
     change_note = request.form.get('change_note', 'Ordinance text updated')
@@ -138,7 +124,7 @@ def save_ordinance():
 
     if not new_text:
         flash("Ordinance text cannot be empty.", "danger")
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('admin_bp.dashboard'))
 
     settings = SiteSettings.query.first()
     if not settings:
@@ -148,38 +134,31 @@ def save_ordinance():
     settings.ordinance_text = new_text
     db.session.commit()
 
-    # Auto-log hash
     entry = log_hash(new_text, change_note, changed_by)
-
     flash(
-        f"✅ Ordinance saved and hash logged. "
-        f"SHA-256: {entry.hash_value[:16]}...",
+        f"✅ Ordinance saved and hash logged. SHA-256: {entry.hash_value[:16]}...",
         "success"
     )
-    return redirect(url_for('dashboard'))
-
+    return redirect(url_for('admin_bp.dashboard'))
 
 # ── Hash Chain Integrity Check ─────────────────────────────────
-@app.route('/dashboard/verify-chain')
+@admin_bp.route('/dashboard/verify-chain')
 def verify_chain():
     result = verify_chain_integrity()
     if result['valid']:
         flash(
-            f"✅ Hash chain integrity verified. "
-            f"{result['total']} entries — chain is unbroken.",
+            f"✅ Hash chain verified. {result['total']} entries — chain is unbroken.",
             "success"
         )
     else:
         flash(
-            f"⚠️ Hash chain integrity BROKEN at entry IDs: "
-            f"{result['broken_at']}. Possible document tampering.",
+            f"⚠️ Hash chain BROKEN at entry IDs: {result['broken_at']}.",
             "danger"
         )
-    return redirect(url_for('dashboard'))
-
+    return redirect(url_for('admin_bp.dashboard'))
 
 # ── Sign Petition ──────────────────────────────────────────────
-@app.route('/petition/sign', methods=['POST'])
+@main_bp.route('/petition/sign', methods=['POST'])
 def sign_petition():
     first_name    = request.form.get('first_name', '').strip()
     last_name     = request.form.get('last_name', '').strip()
@@ -189,25 +168,18 @@ def sign_petition():
     phone         = request.form.get('phone', '').strip()
     affirm        = request.form.get('affirm')
 
-    # Validations
     if not all([first_name, last_name, enrollment_id]):
         flash("Please fill in all required fields.", "danger")
-        return redirect(url_for('petition'))
+        return redirect(url_for('main_bp.petition'))
 
     if not affirm:
         flash("You must check the affirmation box to sign.", "danger")
-        return redirect(url_for('petition'))
+        return redirect(url_for('main_bp.petition'))
 
-    # Duplicate check by enrollment ID
-    existing = Signer.query.filter_by(
-        enrollment_id=enrollment_id
-    ).first()
+    existing = Signer.query.filter_by(enrollment_id=enrollment_id).first()
     if existing:
-        flash(
-            "This enrollment ID has already signed the petition.",
-            "warning"
-        )
-        return redirect(url_for('petition'))
+        flash("This enrollment ID has already signed the petition.", "warning")
+        return redirect(url_for('main_bp.petition'))
 
     signer = Signer(
         first_name    = first_name,
@@ -221,9 +193,6 @@ def sign_petition():
     db.session.add(signer)
     db.session.commit()
 
-    flash(
-        f"✅ Thank you, {first_name}! Your signature has been recorded.",
-        "success"
-    )
-    return redirect(url_for('petition'))
+    flash(f"✅ Thank you, {first_name}! Your signature has been recorded.", "success")
+    return redirect(url_for('main_bp.petition'))
 
