@@ -14,6 +14,12 @@ from app.utils.hash_utils import (
     verify_content_matches_hash,
 )
 import datetime
+from app.forms import SignatureForm  # Adjust import based on your file structure
+from app.models import Signer       # Assuming Signer is your database model
+from app import db                  # Your database instance
+import os
+from werkzeug.utils import secure_filename
+
 
 # ── Define Blueprints ──────────────────────────────────────────
 main_bp  = Blueprint('main_bp',  __name__)
@@ -199,39 +205,41 @@ def verify_chain():
 # ── Sign Petition ──────────────────────────────────────────────
 @main_bp.route('/petition/sign', methods=['POST'])
 def sign_petition():
-    first_name    = request.form.get('first_name',    '').strip()
-    last_name     = request.form.get('last_name',     '').strip()
-    enrollment_id = request.form.get('enrollment_id', '').strip()
-    city          = request.form.get('city',          '').strip()
-    email         = request.form.get('email',         '').strip()
-    phone         = request.form.get('phone',         '').strip()
-    affirm        = request.form.get('affirm')
+    form = SignatureForm()
 
-    if not all([first_name, last_name, enrollment_id]):
-        flash("Please fill in all required fields.", "danger")
+    # validate_on_submit handles the POST request and field validations automatically
+    if form.validate_on_submit():
+        enrollment_id = form.enrollment_id.data.strip()
+        
+        # 1. Database Check for existing signatures
+        existing = Signer.query.filter_by(enrollment_id=enrollment_id).first()
+        if existing:
+            flash("This enrollment ID has already signed the petition.", "warning")
+            return redirect(url_for('main_bp.petition'))
+
+        # 2. Handle File Upload securely
+        id_file = form.id_upload.data
+        filename = secure_filename(id_file.filename)
+        # Assuming you have an UPLOAD_FOLDER configured in your app config:
+        # id_file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+
+        # 3. Save to Database
+        signer = Signer(
+            full_name=form.full_name.data.strip(),
+            enrollment_id=enrollment_id,
+            email=form.email.data.strip(),
+            phone=form.phone.data.strip() if form.phone.data else None,
+            id_upload_path=filename  # Or save whatever path structure you use
+        )
+        
+        db.session.add(signer)
+        db.session.commit()
+
+        flash("Thank you! Your signature has been recorded successfully.", "success")
         return redirect(url_for('main_bp.petition'))
 
-    if not affirm:
-        flash("You must check the affirmation box to sign.", "danger")
-        return redirect(url_for('main_bp.petition'))
-
-    existing = Signer.query.filter_by(enrollment_id=enrollment_id).first()
-    if existing:
-        flash("This enrollment ID has already signed the petition.", "warning")
-        return redirect(url_for('main_bp.petition'))
-
-    signer = Signer(
-        first_name    = first_name,
-        last_name     = last_name,
-        enrollment_id = enrollment_id,
-        city          = city,
-        email         = email,
-        phone         = phone,
-        signed_at     = datetime.datetime.utcnow(),
-    )
-    db.session.add(signer)
-    db.session.commit()
-
-    flash(f"✅ Thank you, {first_name}! Your signature has been recorded.", "success")
-    return redirect(url_for('main_bp.petition'))
+    # If form validation fails (e.g. missing fields, bad email format, no ID uploaded)
+    # We send the form back to the template so it can display the specific validation errors.
+    flash("Please correct the errors in the form.", "danger")
+    return render_template('petition.html', form=form)
 
