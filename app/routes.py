@@ -8,6 +8,7 @@ from app.forms import SignatureForm
 from app.utils import compute_sha256, get_current_hash
 
 main_bp = Blueprint('main_bp', __name__)
+admin_bp = Blueprint('admin_bp', __name__)
 
 @main_bp.route('/petition', methods=['GET', 'POST'])
 def petition():
