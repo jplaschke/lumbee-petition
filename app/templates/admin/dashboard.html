@@ -135,7 +135,7 @@
               </button>
               <div class="collapse mt-2" id="edit-member-{{ member.slot }}">
                 <form method="POST"
-                  action="{{ url_for('update_committee_member', slot=member.slot) }}">
+                  action="{{ url_for('admin_bp.update_committee_member', slot=member.slot) }}">
                   <div class="mb-2">
                     <input type="text" name="full_name" class="form-control form-control-sm"
                       placeholder="Full Name *"
@@ -239,7 +239,7 @@
           📝 Save Ordinance Text & Generate New Hash
         </div>
         <div class="card-body">
-          <form method="POST" action="{{ url_for('save_ordinance') }}">
+          <form method="POST" action="{{ url_for('admin_bp.save_ordinance') }}">
             <div class="mb-2">
               <label class="form-label small fw-bold">Ordinance Text (paste full text to hash)</label>
               <textarea name="ordinance_text" class="form-control"
