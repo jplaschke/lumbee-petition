@@ -1,6 +1,6 @@
 import hashlib
 import json
-from datetime import datetime
+import datetime
 from app import db
 
 class Signer(db.Model):
@@ -10,7 +10,7 @@ class Signer(db.Model):
     email = db.Column(db.String(150), nullable=True)
     phone = db.Column(db.String(30), nullable=True)
     ip_address = db.Column(db.String(50), nullable=True)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     verified = db.Column(db.Boolean, default=False)
 
 class SiteSettings(db.Model):
@@ -48,7 +48,7 @@ class DocumentHashLog(db.Model):
     previous_hash = db.Column(db.String(64), nullable=True)  # chain link
     changed_by = db.Column(db.String(150), nullable=True)
     change_note = db.Column(db.String(500), nullable=True)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     is_current = db.Column(db.Boolean, default=True)
 
     @staticmethod
