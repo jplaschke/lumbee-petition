@@ -1,44 +1,50 @@
-from flask import Flask
+import os
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
-import os
 
-db = SQLAlchemy()
-login_manager = LoginManager()
+# ── These are initialized in models.py ────────────────────────
+from app.models import db, User
 
 def create_app():
-    app = Flask(__name__)
-    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'change-me')
+    app = Flask(__name__, template_folder='templates')
+
+    # ── Config ────────────────────────────────────────────────
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
+        'DATABASE_URL', 'sqlite:///petition.db'
+    )
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    if os.environ.get('RENDER'):
-        app.config['SQLALCHEMY_DATABASE_URI'] = \
-            'sqlite:////app/app/static/uploads/petition.db'
-    else:
-        app.config['SQLALCHEMY_DATABASE_URI'] = \
-            os.environ.get('DATABASE_URL', 'sqlite:///petition.db')
-
+    # ── Init Extensions ───────────────────────────────────────
     db.init_app(app)
-    login_manager.init_app(app)
-    login_manager.login_view = 'admin_bp.login'
 
+    # ── Flask-Login ───────────────────────────────────────────
+    login_manager = LoginManager()
+    login_manager.login_view = 'admin_bp.login'
+    login_manager.init_app(app)
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.query.get(int(user_id))
+
+    # ── Register Blueprints ───────────────────────────────────
     from app.routes import main_bp, admin_bp
     app.register_blueprint(main_bp)
-    app.register_blueprint(admin_bp, url_prefix='/admin')
+    app.register_blueprint(admin_bp)
 
+    # ── Error Handlers ────────────────────────────────────────
+    @app.errorhandler(404)
+    def not_found(e):
+        return render_template('404.html'), 404
+
+    @app.errorhandler(500)
+    def server_error(e):
+        return render_template('500.html'), 500
+
+    # ── Create Tables ─────────────────────────────────────────
     with app.app_context():
         db.create_all()
-
-        from app.models import SiteSettings
-        if not SiteSettings.query.first():
-            default_settings = SiteSettings(
-                petition_title='Petition for Gaming Ordinance',
-                petition_text='Under Title V of the Lumbee Constitution...',
-                target_signatures=6400,
-                background_color='#8B0000'
-            )
-            db.session.add(default_settings)
-            db.session.commit()
 
     return app
 
