@@ -4,13 +4,13 @@ from werkzeug.utils import secure_filename
 from app import db
 from app.models import SiteSettings, PetitionCommitteeMember, Signer, DocumentHashLog
 from app.forms import SignatureForm
-from app.utils import compute_sha256, get_current_hash
+from app.utils import compute_sha256
 
 # ── BLUEPRINT DECLARATIONS ───────────────────────────────────────────
 main_bp = Blueprint('main_bp', __name__)
 admin_bp = Blueprint('admin_bp', __name__)
 
-# ── FIXED ROOT ROUTE (Changed from '/petition' to '/') ───────────────
+# ── FIXED ROOT ROUTE ─────────────────────────────────────────────────
 @main_bp.route('/', methods=['GET', 'POST'])
 def petition():
     form = SignatureForm()
@@ -62,19 +62,28 @@ def petition():
         return jsonify({"status": "error", "message": "Missing or invalid form fields.", "details": errors}), 400
 
     # GET RENDER BLOCKS
-    settings          = SiteSettings.query.first()
-    ordinance_text    = settings.ordinance_text if settings else ""
+    settings = SiteSettings.query.first()
+    ordinance_text = settings.ordinance_text if settings else ""
     committee_members = PetitionCommitteeMember.query.order_by(PetitionCommitteeMember.slot).all()
-    recent_signers    = Signer.query.order_by(Signer.signed_at.desc()).limit(10).all()
-    total_signatures  = Signer.query.count()
-    goal              = settings.target_signatures if settings else 1000
-    current_hash      = compute_sha256(ordinance_text) if ordinance_text else "—"
-
-    _latest    = get_current_hash(DocumentHashLog) if 'DocumentHashLog' in globals() else None
+    recent_signers = Signer.query.order_by(Signer.signed_at.desc()).limit(10).all()
+    total_signatures = Signer.query.count()
+    goal = settings.target_signatures if settings else 1000
     
+    # Generate current live text hash
+    current_hash = compute_sha256(ordinance_text) if ordinance_text else "—"
+
+    # FIRST-PRINCIPLES DEFENSIVE HASH MATCHING
     hash_match = False
-    if _latest and ordinance_text:
-        hash_match = (current_hash == _latest.get("sha256_hash"))
+    try:
+        # Fetch the latest structural log entry safely directly from the DB model
+        latest_log = DocumentHashLog.query.order_by(DocumentHashLog.id.desc()).first()
+        if latest_log and ordinance_text:
+            # Check for object attribute or dictionary key safely using fallbacks
+            logged_hash = getattr(latest_log, 'sha256_hash', None) or latest_log.get('sha256_hash')
+            hash_match = (current_hash == logged_hash)
+    except Exception:
+        # Fallback gracefully instead of throwing a 500 internal crash if log structures differ
+        hash_match = False
 
     start_date = (
         settings.petition_start_date.strftime('%B %d, %Y')
@@ -108,7 +117,7 @@ def petition():
         home_summary      = home_summary
     )
 
-# ── ORIGINAL PRINT UTILITIES ──────────────────────────────────────────
+# ── PRINT & DOWNLOAD PATHWAYS ────────────────────────────────────────
 @main_bp.route('/petition/print')
 def print_ordinance():
     settings = SiteSettings.query.first()
@@ -124,7 +133,7 @@ def download_ordinance_pdf():
         flash("The official document PDF version is currently being generated. Please print or review via web text view.", "warning")
         return redirect(url_for('main_bp.petition'))
 
-# ── ORIGINAL ADMIN BLUEPRINT PATHS ────────────────────────────────────
+# ── ADMIN PATHWAYS ───────────────────────────────────────────────────
 @admin_bp.route('/admin/dashboard')
 def dashboard():
     settings = SiteSettings.query.first()
