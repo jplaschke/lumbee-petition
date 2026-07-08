@@ -14,12 +14,27 @@ class Signer(db.Model):
     verified = db.Column(db.Boolean, default=False)
 
 class SiteSettings(db.Model):
+    __tablename__ = 'site_settings'
+
     id = db.Column(db.Integer, primary_key=True)
-    petition_title = db.Column(db.String(300), nullable=False,
-        default="Proposed Ordinance No. 2026- | Lumbee Gaming Governance, Transparency, and Economic Development Act")
+    petition_title = db.Column(
+        db.String(300),
+        nullable=False,
+        default=(
+            "Proposed Ordinance No. 2026- | Lumbee Gaming Governance, "
+            "Transparency, and Economic Development Act"
+        )
+    )  # ✅ closing ) added here
     target_signatures = db.Column(db.Integer, default=500)
+    petition_text = db.Column(db.Text, nullable=True)
+    petition_text_hash = db.Column(db.String(64), nullable=True)
     ordinance_text = db.Column(db.Text, nullable=True)
-    ordinance_hash = db.Column(db.String(64), nullable=True)  # SHA-256
+    ordinance_hash = db.Column(db.String(64), nullable=True)
+    email = db.Column(db.String(255), nullable=True)
+    background_color = db.Column(db.String(50), nullable=True, default="#8B0000")
+
+    def __repr__(self):
+        return f'<SiteSettings id={self.id}>'
 
 class PetitionCommitteeMember(db.Model):
     """
