@@ -638,7 +638,7 @@
       {% endfor %}
     {% endwith %}
 
-    <form method="POST" action="{{ url_for('sign_petition') }}" id="signForm">
+    <form method="POST" action="{{ url_for('main_bp.sign_petition') }}" id="signForm">
       {{ form.hidden_tag() if form.hidden_tag is defined }}
 
       <div class="form-grid">
