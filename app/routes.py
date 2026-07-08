@@ -20,6 +20,9 @@ import datetime
 main_bp  = Blueprint('main_bp',  __name__)
 admin_bp = Blueprint('admin_bp', __name__)
 
+@main_bp.route('/')
+def index():
+    return render_template('index.html')
 
 # ── Petition Public Page ───────────────────────────────────────
 @main_bp.route('/petition')
@@ -27,7 +30,7 @@ def petition():
     settings          = SiteSettings.query.first()
     ordinance_text    = settings.ordinance_text if settings else ""
     committee_members = PetitionCommitteeMember.query.order_by(
-        PetitionCommitteeMember.slot_number
+        PetitionCommitteeMember.slot
     ).all()
     recent_signers    = Signer.query.order_by(
         Signer.signed_at.desc()
@@ -66,7 +69,7 @@ def print_ordinance():
     settings          = SiteSettings.query.first()
     ordinance_text    = settings.ordinance_text if settings else ""
     committee_members = PetitionCommitteeMember.query.order_by(
-        PetitionCommitteeMember.slot_number
+        PetitionCommitteeMember.slot
     ).all()
 
     current_hash = compute_sha256(ordinance_text) if ordinance_text else "—"
@@ -97,7 +100,7 @@ def download_ordinance_pdf():
         settings          = SiteSettings.query.first()
         ordinance_text    = settings.ordinance_text if settings else ""
         committee_members = PetitionCommitteeMember.query.order_by(
-            PetitionCommitteeMember.slot_number
+            PetitionCommitteeMember.slot
         ).all()
 
         current_hash = compute_sha256(ordinance_text) if ordinance_text else "—"
