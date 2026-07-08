@@ -33,30 +33,66 @@ def index():
 
 
 # ── Petition Public Page ───────────────────────────────────────
-@main_bp.route('/petition')
+# Change this route to accept BOTH methods
+@main_bp.route('/petition', methods=['GET', 'POST'])
 def petition():
     form = SignatureForm()
+
+    # 1. HANDLE FORM SUBMISSION (POST)
+    if form.validate_on_submit():
+        enrollment_id = form.enrollment_id.data.strip()
+        
+        # Check unique constraint
+        existing = Signer.query.filter_by(enrollment_id=enrollment_id).first()
+        if existing:
+            flash("This enrollment ID has already signed the petition.", "warning")
+            return redirect(url_for('main_bp.petition'))
+
+        # Handle File Upload securely
+        id_file = form.id_upload.data
+        filename = secure_filename(id_file.filename)
+        # id_file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+
+        # Save to Database
+        signer = Signer(
+            full_name=form.full_name.data.strip(),
+            enrollment_id=enrollment_id,
+            email=form.email.data.strip(),
+            phone=form.phone.data.strip() if form.phone.data else None,
+            id_upload_path=filename
+        )
+        db.session.add(signer)
+        db.session.commit()
+
+        flash("Thank you! Your signature has been recorded successfully.", "success")
+        return redirect(url_for('main_bp.petition')) # Redirect after successful POST
+
+    # 2. HANDLE DISPLAY & VALIDATION FAILURE (GET / POST Failures)
     settings          = SiteSettings.query.first()
     ordinance_text    = settings.ordinance_text if settings else ""
-    committee_members = PetitionCommitteeMember.query.order_by(
-        PetitionCommitteeMember.slot
-    ).all()
+    committee_members = PetitionCommitteeMember.query.order_by(PetitionCommitteeMember.slot).all()
     recent_signers    = Signer.query.order_by(Signer.signed_at.desc()).limit(10).all()
     total_signatures  = Signer.query.count()
     goal              = settings.target_signatures if settings else 1000
     current_hash      = compute_sha256(ordinance_text) if ordinance_text else "—"
 
     _latest    = get_current_hash(DocumentHashLog)
-    hash_match = (
-        verify_content_matches_hash(ordinance_text, _latest["sha256_hash"])
-        if _latest and ordinance_text else False
+    hash_match = verify_content_matches_hash(ordinance_text, _latest["sha256_hash"]) if _latest and ordinance_text else False
+    start_date = settings.petition_start_date.strftime('%B %d, %Y') if settings and settings.petition_start_date else "—"
+
+    external_links = {
+        "vote_no": "https://votenodemandbetter.com",
+        "lumbee_docs": "https://www.lumbeetribe.com/faqs-history",
+        "ordinances": "https://www.lumbeetribe.com/tribal-proposed-ordinances"
+    }
+    
+    home_summary = (
+        "This petition acts as a direct community initiative to protect the integrity of "
+        "our foundational documents. By verifying and logging structural changes via SHA-256 cryptographic hashes, "
+        "we ensure transparency and member consent before modifications are enacted."
     )
 
-    start_date = (
-        settings.petition_start_date.strftime('%B %d, %Y')
-        if settings and settings.petition_start_date else "—"
-    )
-
+    # If form.validate_on_submit() was false, this renders with the error highlights!
     return render_template(
         'petition.html',
         form              = form,
@@ -69,7 +105,10 @@ def petition():
         current_hash      = current_hash,
         hash_match        = hash_match,
         start_date        = start_date,
+        links             = external_links,
+        home_summary      = home_summary
     )
+
 
 
 # ── Print / PDF View ───────────────────────────────────────────

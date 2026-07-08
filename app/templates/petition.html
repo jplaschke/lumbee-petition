@@ -637,8 +637,32 @@
       </div>
       {% endfor %}
     {% endwith %}
+        
+    <!-- Summary Block and External Resources -->
+    <div class="card mb-4 shadow-sm border-0 bg-light">
+        <div class="card-body">
+        <h4 class="card-title text-dark">Petition Overview & Context</h4>
+        <p class="card-text text-muted font-italic">{{ home_summary }}</p>
+        
+        <hr class="my-3">
+        
+        <h5 class="h6 text-uppercase tracking-wider font-weight-bold mb-3">Official Tribal Resources & Campaigns</h5>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{{ links.vote_no }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-danger mr-2">
+            <i class="fas fa-external-link-alt"></i> Vote No, Demand Better Campaign
+            </a>
+            <a href="{{ links.lumbee_docs }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary mr-2">
+            <i class="fas fa-book"></i> Lumbee Constitution & History
+            </a>
+            <a href="{{ links.ordinances }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-gavel"></i> Tribal Ordinances & Resolutions
+            </a>
+        </div>
+        </div>
+    </div>
 
-    <form method="POST" action="{{ url_for('main_bp.sign_petition') }}" id="signForm">
+    <!-- Inside petition.html and sign.html -->
+    <form method="POST" action="{{ url_for('main_bp.petition') }}" id="signForm" enctype="multipart/form-data">
       {{ form.hidden_tag() if form.hidden_tag is defined }}
 
       <div class="form-grid">
