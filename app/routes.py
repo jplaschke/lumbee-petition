@@ -12,7 +12,7 @@ admin_bp = Blueprint('admin_bp', __name__)
 
 # ── FIXED ROOT ROUTE ─────────────────────────────────────────────────
 @main_bp.route('/', methods=['GET', 'POST'])
-def petition():
+def index():
     form = SignatureForm()
 
     # Handle Form Submission via AJAX/Fetch inside Modal
