@@ -4,7 +4,8 @@ from werkzeug.utils import secure_filename
 from app import db
 from app.models import SiteSettings, PetitionCommitteeMember, Signer, DocumentHashLog
 from app.forms import SignatureForm
-from app.utils import compute_sha256, get_current_hash, verify_content_matches_hash
+# 1. FIXED: Removed 'verify_content_matches_hash' from the import list
+from app.utils import compute_sha256, get_current_hash
 
 main_bp = Blueprint('main_bp', __name__)
 
@@ -14,7 +15,6 @@ def petition():
 
     # Handle Form Submission via AJAX/Fetch inside Modal
     if form.validate_on_submit():
-        # CUSTOM ENFORCEMENT: Check if they acknowledged reading the text
         from flask import request
         read_confirmation = request.form.get('read_ordinance_check')
         
@@ -59,7 +59,7 @@ def petition():
         errors = [f"{field.label.text}: {', '.join(field.errors)}" for field in form if field.errors]
         return jsonify({"status": "error", "message": "Missing or invalid form fields.", "details": errors}), 400
 
-    # GET RENDER BLOCKS (Clean Layout Generation)
+    # GET RENDER BLOCKS
     settings          = SiteSettings.query.first()
     ordinance_text    = settings.ordinance_text if settings else ""
     committee_members = PetitionCommitteeMember.query.order_by(PetitionCommitteeMember.slot).all()
@@ -68,9 +68,19 @@ def petition():
     goal              = settings.target_signatures if settings else 1000
     current_hash      = compute_sha256(ordinance_text) if ordinance_text else "—"
 
-    _latest    = get_current_hash(DocumentHashLog)
-    hash_match = verify_content_matches_hash(ordinance_text, _latest["sha256_hash"]) if _latest and ordinance_text else False
-    start_date = settings.petition_start_date.strftime('%B %d, %Y') if settings and settings.petition_start_date else "—"
+    # 2. FIXED: Changed the verification logic to use a direct string comparison 
+    # instead of calling the missing utility function.
+    _latest    = get_current_hash(DocumentHashLog) if 'DocumentHashLog' in globals() else None
+    
+    hash_match = False
+    if _latest and ordinance_text:
+        # Direct string comparison between your calculated hash and the database log hash
+        hash_match = (current_hash == _latest.get("sha256_hash"))
+
+    start_date = (
+        settings.petition_start_date.strftime('%B %d, %Y')
+        if settings and settings.petition_start_date else "—"
+    )
 
     external_links = {
         "vote_no": "https://votenodemandbetter.com",
