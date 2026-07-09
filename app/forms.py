@@ -45,3 +45,13 @@ class SettingsForm(FlaskForm):
     header_image      = FileField('Header Image', validators=[FileAllowed(['jpg','jpeg','png','gif'])])
     background_image  = FileField('Background Image', validators=[FileAllowed(['jpg','jpeg','png','gif'])])
     submit            = SubmitField('Save Settings')
+
+
+class OrdinanceUploadForm(FlaskForm):
+    pdf_file    = FileField('Ordinance PDF', validators=[
+        FileRequired(message="Please choose the ordinance PDF to upload."),
+        FileAllowed(['pdf'], 'Only PDF files are allowed.')
+    ])
+    change_note = StringField('Change Note (optional)')
+    submit      = SubmitField('Upload & Generate Hash')
+

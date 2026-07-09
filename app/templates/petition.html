@@ -516,7 +516,7 @@
   <!-- ORDINANCE PREVIEW -->
   <div class="ordinance-preview" id="ordinance">
     <h3>📄 Proposed Ordinance Text</h3>
-    <div class="ordinance-scroll">{{ ordinance_text }}</div>
+    <div class="ordinance-scroll">{{ ordinance_text or 'No text preview available yet. Download or view the official PDF using the buttons below.' }}</div>
     <div class="ordinance-actions">
       <a href="{{ url_for('main_bp.print_ordinance') }}" target="_blank" class="btn-download">
         🖨️ View / Print Full Ordinance

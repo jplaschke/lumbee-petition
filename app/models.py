@@ -14,16 +14,30 @@ class AdminUser(db.Model, UserMixin):
 
 class Signer(db.Model):
     __tablename__ = 'signer'
+    id              = db.Column(db.Integer, primary_key=True)
+    full_name       = db.Column(db.String(200), nullable=False)
+    enrollment_id   = db.Column(db.String(100), nullable=False, unique=True)
+    email           = db.Column(db.String(150), nullable=True)
+    phone           = db.Column(db.String(30),  nullable=True)
+    id_upload_path  = db.Column(db.String(300), nullable=True)
+    ip_address      = db.Column(db.String(50),  nullable=True)
+    timestamp       = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    verified        = db.Column(db.Boolean, default=False)
+    receipt_sent    = db.Column(db.Boolean, default=False)
+
+
+class DuplicateAttempt(db.Model):
+    """
+    Logs rejected attempts to sign with an enrollment ID that has already
+    signed, so the admin dashboard can report on possible double-voting.
+    """
+    __tablename__ = 'duplicate_attempt'
     id            = db.Column(db.Integer, primary_key=True)
-    first_name    = db.Column(db.String(100), nullable=False)
-    last_name     = db.Column(db.String(100), nullable=False)
-    enrollment_id = db.Column(db.String(100), nullable=False, unique=True)
-    city          = db.Column(db.String(150), nullable=True)
+    full_name     = db.Column(db.String(200), nullable=True)
+    enrollment_id = db.Column(db.String(100), nullable=False)
     email         = db.Column(db.String(150), nullable=True)
-    phone         = db.Column(db.String(30),  nullable=True)
     ip_address    = db.Column(db.String(50),  nullable=True)
-    signed_at     = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    verified      = db.Column(db.Boolean, default=False)
+    timestamp     = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
 
 class SiteSettings(db.Model):
@@ -40,6 +54,8 @@ class SiteSettings(db.Model):
     ordinance_hash      = db.Column(db.String(64), nullable=True)
     email               = db.Column(db.String(255), nullable=True)
     background_color    = db.Column(db.String(50), nullable=True, default="#8B0000")
+    header_image        = db.Column(db.String(300), nullable=True)
+    background_image    = db.Column(db.String(300), nullable=True)
     petition_start_date = db.Column(db.DateTime, nullable=True)
 
     def __repr__(self):
