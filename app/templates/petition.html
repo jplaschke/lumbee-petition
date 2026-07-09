@@ -584,30 +584,28 @@
 
                     <!-- FIELD PROCESSING LAYOUT -->
                     <div class="row">
-                        <div class="col-md-6 form-group">
+                        <div class="col-md-6 form-group mb-3">
                             <label class="font-weight-bold small text-uppercase" style="color:#8B0000;">{{ form.full_name.label }} *</label>
                             {{ form.full_name(class="form-control", placeholder="First & Last Name", required=True) }}
                         </div>
-                        <div class="col-md-6 form-group">
+                        <div class="col-md-6 form-group mb-3">
                             <label class="font-weight-bold small text-uppercase" style="color:#8B0000;">{{ form.enrollment_id.label }} *</label>
                             {{ form.enrollment_id(class="form-control", placeholder="Lumbee Enrollment ID", required=True) }}
                         </div>
                     </div>
 
-                    <div class="form-group my-3">
+                    <div class="form-group my-3 mb-3">
                         <label class="font-weight-bold small text-uppercase" style="color:#8B0000;">{{ form.id_upload.label }} *</label>
-                        <div class="custom-file">
-                            {{ form.id_upload(class="form-control-file", required=True) }}
-                        </div>
+                        {{ form.id_upload(class="form-control", required=True) }}
                         <small class="text-muted d-block mt-1">Photo verification of your Lumbee Membership card is mandatory to prevent fraudulent submissions.</small>
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6 form-group">
+                        <div class="col-md-6 form-group mb-3">
                             <label class="font-weight-bold small text-uppercase" style="color:#8B0000;">{{ form.email.label }} *</label>
                             {{ form.email(class="form-control", placeholder="name@domain.com", required=True) }}
                         </div>
-                        <div class="col-md-6 form-group">
+                        <div class="col-md-6 form-group mb-3">
                             <label class="font-weight-bold small text-uppercase" style="color:#8B0000;">{{ form.phone.label }}</label>
                             {{ form.phone(class="form-control", placeholder="(910) 555-0100") }}
                         </div>
@@ -623,7 +621,7 @@
                 </div>
                 <div class="modal-footer bg-light">
                     <button type="button" class="font-weight-bold" data-bs-dismiss="modal" style="background:#fff; color:#8B0000; border:2px solid #8B0000; padding:8px 20px; border-radius:50px; font-size:0.9rem;">Cancel</button>
-                    <button type="submit" id="signBtn" class="font-weight-bold" disabled style="background: linear-gradient(135deg, #8B0000, #6B0000); color:#fff; border:none; padding:8px 24px; border-radius:50px; font-size:0.9rem; box-shadow:0 4px 15px rgba(139,0,0,0.2);">✍️ Confirm & Sign</button>
+                    <button type="submit" id="signBtn" class="font-weight-bold" style="background: linear-gradient(135deg, #8B0000, #6B0000); color:#fff; border:none; padding:8px 24px; border-radius:50px; font-size:0.9rem; box-shadow:0 4px 15px rgba(139,0,0,0.2);">✍️ Confirm & Sign</button>
                 </div>
             </form>
         </div>
@@ -631,13 +629,8 @@
 </div>
 
 <script>
-  // Dynamic validation switch tracking checkbox changes
   const affirmCheck = document.getElementById('affirmCheck');
   const signBtn     = document.getElementById('signBtn');
-  
-  affirmCheck.addEventListener('change', function() {
-    signBtn.disabled = !this.checked;
-  });
 
   // Handle Form Submission via Fetch/AJAX
   document.getElementById('asyncSignForm').addEventListener('submit', function(e) {
