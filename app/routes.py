@@ -136,7 +136,7 @@ def download_ordinance_pdf():
         return send_from_directory(pdf_dir, 'ordinance.pdf', as_attachment=True)
     except Exception:
         flash("The official document PDF version is currently being generated. Please print or review via web text view.", "warning")
-        return redirect(url_for('main_bp.petition'))
+        return redirect(url_for('main_bp.sign_petition'))
 
 # ── ADMIN PATHWAYS ───────────────────────────────────────────────────
 @admin_bp.route('/admin/dashboard')

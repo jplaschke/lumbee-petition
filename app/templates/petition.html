@@ -3,20 +3,22 @@
 
 {% block head_extra %}
 <style>
+  .initiative-banner, .container { font-family: system-ui, sans-serif; }
+
   /* ── Initiative Banner ── */
   .initiative-banner {
-    background: linear-gradient(135deg, #1a3a5c 0%, #0d2238 100%);
+    background: linear-gradient(135deg, #6B0000 0%, #8B0000 50%, #A00000 100%);
     color: #fff;
     padding: 28px 24px 20px;
     text-align: center;
-    border-bottom: 4px solid #c8a951;
+    border-bottom: 4px solid #DAA520;
     margin-bottom: 0;
   }
 
   .initiative-badge {
     display: inline-block;
-    background: #c8a951;
-    color: #1a1a1a;
+    background: #DAA520;
+    color: #1a0000;
     font-size: 0.7rem;
     font-weight: 800;
     letter-spacing: 0.15em;
@@ -36,7 +38,7 @@
 
   .initiative-banner .ordinance-num {
     font-size: 1.1rem;
-    color: #c8a951;
+    color: #DAA520;
     font-weight: 700;
     letter-spacing: 0.06em;
     margin-bottom: 8px;
@@ -44,7 +46,7 @@
 
   .initiative-banner .initiative-sub {
     font-size: 0.85rem;
-    color: #a8c4e0;
+    color: rgba(255,255,255,0.85);
     font-style: italic;
   }
 
@@ -71,8 +73,8 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    background: #eef4fb;
-    border: 1px solid #b0c8e8;
+    background: #fdf6f6;
+    border: 1px solid #f0d8d8;
     border-radius: 6px;
     padding: 12px 16px;
     margin-bottom: 24px;
@@ -85,7 +87,7 @@
 
   .article-v-text {
     font-size: 0.88rem;
-    color: #1a3a5c;
+    color: #8B0000;
     line-height: 1.6;
   }
 
@@ -98,7 +100,7 @@
   /* ── Progress Bar ── */
   .progress-section {
     background: #fff;
-    border: 1px solid #dde4ee;
+    border: 1px solid #f0e0e0;
     border-radius: 8px;
     padding: 20px 22px;
     margin-bottom: 24px;
@@ -110,12 +112,12 @@
     justify-content: space-between;
     font-size: 0.88rem;
     font-weight: 600;
-    color: #1a3a5c;
+    color: #8B0000;
     margin-bottom: 8px;
   }
 
   .progress-bar-outer {
-    background: #e0e8f4;
+    background: #f0e8e8;
     border-radius: 100px;
     height: 18px;
     overflow: hidden;
@@ -124,7 +126,7 @@
 
   .progress-bar-inner {
     height: 100%;
-    background: linear-gradient(90deg, #1a3a5c, #2e6da4);
+    background: linear-gradient(90deg, #8B0000, #DAA520);
     border-radius: 100px;
     transition: width 0.6s ease;
     min-width: 4px;
@@ -138,13 +140,13 @@
   }
 
   .progress-meta span strong {
-    color: #1a3a5c;
+    color: #8B0000;
   }
 
   /* ── Committee Section ── */
   .committee-section {
     background: #fff;
-    border: 1px solid #dde4ee;
+    border: 1px solid #f0e0e0;
     border-radius: 8px;
     padding: 20px 22px;
     margin-bottom: 24px;
@@ -154,7 +156,7 @@
   .committee-section h3 {
     font-size: 1rem;
     font-weight: 700;
-    color: #1a3a5c;
+    color: #8B0000;
     margin-bottom: 4px;
     letter-spacing: 0.03em;
     text-transform: uppercase;
@@ -174,10 +176,10 @@
   }
 
   .committee-card {
-    border: 1px solid #c8d8ee;
+    border: 1px solid #f0d8d8;
     border-radius: 6px;
     padding: 14px 16px;
-    background: #f5f8fc;
+    background: #fdf6f6;
     text-align: center;
   }
 
@@ -186,14 +188,14 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: #2e6da4;
+    color: #DAA520;
     margin-bottom: 6px;
   }
 
   .committee-card .member-name {
     font-size: 0.95rem;
     font-weight: 700;
-    color: #1a1a1a;
+    color: #333333;
     margin-bottom: 4px;
   }
 
@@ -217,7 +219,7 @@
   /* ── Ordinance Preview ── */
   .ordinance-preview {
     background: #fff;
-    border: 1px solid #dde4ee;
+    border: 1px solid #f0e0e0;
     border-radius: 8px;
     padding: 20px 22px;
     margin-bottom: 24px;
@@ -227,7 +229,7 @@
   .ordinance-preview h3 {
     font-size: 1rem;
     font-weight: 700;
-    color: #1a3a5c;
+    color: #8B0000;
     margin-bottom: 12px;
     text-transform: uppercase;
     letter-spacing: 0.03em;
@@ -236,8 +238,8 @@
   .ordinance-scroll {
     max-height: 320px;
     overflow-y: auto;
-    background: #f8fafc;
-    border: 1px solid #cdd8e8;
+    background: #fdf6f6;
+    border: 1px solid #f0d8d8;
     border-radius: 4px;
     padding: 16px;
     font-size: 0.85rem;
@@ -258,10 +260,10 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: #1a3a5c;
+    background: linear-gradient(135deg, #8B0000, #6B0000);
     color: #fff;
-    padding: 9px 18px;
-    border-radius: 5px;
+    padding: 10px 20px;
+    border-radius: 50px;
     font-size: 0.88rem;
     font-weight: 600;
     text-decoration: none;
@@ -270,33 +272,33 @@
     transition: background 0.2s;
   }
 
-  .btn-download:hover { background: #0d2238; }
+  .btn-download:hover { opacity: 0.9; }
 
   .btn-print {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     background: transparent;
-    color: #1a3a5c;
+    color: #8B0000;
     padding: 9px 18px;
-    border-radius: 5px;
+    border-radius: 50px;
     font-size: 0.88rem;
     font-weight: 600;
     text-decoration: none;
-    border: 2px solid #1a3a5c;
+    border: 2px solid #8B0000;
     cursor: pointer;
     transition: all 0.2s;
   }
 
   .btn-print:hover {
-    background: #1a3a5c;
+    background: #8B0000;
     color: #fff;
   }
 
   /* ── Hash Integrity Strip ── */
   .hash-strip {
-    background: #1a1a2e;
-    color: #7ec8e3;
+    background: #1a0000;
+    color: #DAA520;
     padding: 10px 16px;
     border-radius: 6px;
     font-family: 'Courier New', monospace;
@@ -309,8 +311,8 @@
   }
 
   .hash-strip .hash-icon { font-size: 1.1rem; }
-  .hash-strip .hash-label { color: #a0c4d8; font-weight: 600; }
-  .hash-strip .hash-val { color: #e0f4ff; word-break: break-all; }
+  .hash-strip .hash-label { color: rgba(255,255,255,0.7); font-weight: 600; }
+  .hash-strip .hash-val { color: #fff5f5; word-break: break-all; }
   .hash-strip .hash-status-ok {
     margin-left: auto;
     background: #1a5c3a;
@@ -325,20 +327,20 @@
   /* ── Refined Scope Box ── */
   .refined-summary-card {
     background: #ffffff;
-    border: 1px solid #e2e8f0;
+    border: 1px solid #f0e0e0;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
     overflow: hidden;
   }
   .refined-sidebar-accent {
     width: 6px;
-    background-color: #1a3a5c;
+    background-color: #8B0000;
   }
 
   /* ── Recent Signers ── */
   .signers-section {
     background: #fff;
-    border: 1px solid #dde4ee;
+    border: 1px solid #f0e0e0;
     border-radius: 8px;
     padding: 20px 22px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
@@ -347,7 +349,7 @@
   .signers-section h3 {
     font-size: 1rem;
     font-weight: 700;
-    color: #1a3a5c;
+    color: #8B0000;
     margin-bottom: 14px;
     text-transform: uppercase;
     letter-spacing: 0.03em;
@@ -367,16 +369,16 @@
     font-size: 0.88rem;
     color: #333;
     padding: 8px 12px;
-    background: #f8fafc;
+    background: #fdf6f6;
     border-radius: 5px;
-    border: 1px solid #e4eaf4;
+    border: 1px solid #f0d8d8;
   }
 
   .signer-avatar {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #1a3a5c, #2e6da4);
+    background: linear-gradient(135deg, #8B0000, #DAA520);
     color: #fff;
     display: flex;
     align-items: center;
@@ -420,19 +422,19 @@
   <div class="refined-summary-card d-flex mb-4">
     <div class="refined-sidebar-accent"></div>
     <div class="card-body p-4">
-        <h4 class="font-weight-bold mb-2" style="color: #1a3a5c; font-size: 1.2rem; letter-spacing: 0.02em;">Petition Context & Scope</h4>
+        <h4 class="font-weight-bold mb-2" style="color: #8B0000; font-size: 1.2rem; letter-spacing: 0.02em;">Petition Context & Scope</h4>
         <p class="text-secondary mb-4" style="font-size: 0.95rem; line-height: 1.6; color: #4a5568;">{{ home_summary }}</p>
         
         <div class="pt-3 border-top d-flex flex-wrap align-items-center justify-content-between gap-3">
             <div class="d-flex flex-wrap gap-2 align-items-center">
                 <span class="text-muted font-weight-bold small text-uppercase mr-2" style="font-size: 0.75rem; letter-spacing: 0.05em;">Resources:</span>
-                <a href="{{ links.vote_no }}" target="_blank" class="btn btn-sm btn-danger px-3 font-weight-bold shadow-sm">Vote No, Demand Better</a>
-                <a href="{{ links.lumbee_docs }}" target="_blank" class="btn btn-sm btn-outline-secondary px-3">Lumbee Constitution</a>
-                <a href="{{ links.ordinances }}" target="_blank" class="btn btn-sm btn-outline-secondary px-3">Tribal Ordinances</a>
+                <a href="{{ links.vote_no }}" target="_blank" class="font-weight-bold" style="display:inline-block; background:#8B0000; color:#fff; padding:8px 16px; border-radius:50px; font-size:0.85rem; text-decoration:none; box-shadow:0 2px 8px rgba(139,0,0,0.2);">Vote No, Demand Better</a>
+                <a href="{{ links.lumbee_docs }}" target="_blank" style="display:inline-block; background:transparent; color:#8B0000; padding:8px 16px; border-radius:50px; font-size:0.85rem; text-decoration:none; border:2px solid #8B0000; font-weight:600;">Lumbee Constitution</a>
+                <a href="{{ links.ordinances }}" target="_blank" style="display:inline-block; background:transparent; color:#8B0000; padding:8px 16px; border-radius:50px; font-size:0.85rem; text-decoration:none; border:2px solid #8B0000; font-weight:600;">Tribal Ordinances</a>
             </div>
 
             <!-- MODAL BUTTON TRIGGER -->
-            <button type="button" class="btn btn-primary px-4 font-weight-bold shadow-sm" data-toggle="modal" data-target="#signPetitionModal" style="background-color: #1a3a5c; border: none;">
+            <button type="button" class="font-weight-bold" data-toggle="modal" data-target="#signPetitionModal" style="background: linear-gradient(135deg, #8B0000, #6B0000); border: none; color: #fff; padding: 12px 32px; border-radius: 50px; font-size: 1rem; box-shadow: 0 4px 15px rgba(139,0,0,0.25); cursor: pointer;">
                 ✍️ Sign Petition
             </button>
         </div>
@@ -512,7 +514,7 @@
   </div>
 
   <!-- ORDINANCE PREVIEW -->
-  <div class="ordinance-preview">
+  <div class="ordinance-preview" id="ordinance">
     <h3>📄 Proposed Ordinance Text</h3>
     <div class="ordinance-scroll">{{ ordinance_text }}</div>
     <div class="ordinance-actions">
@@ -559,7 +561,7 @@
 <div class="modal fade" id="signPetitionModal" tabindex="-1" role="dialog" aria-labelledby="signModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
-            <div class="modal-header bg-dark text-white">
+            <div class="modal-header text-white" style="background: linear-gradient(135deg, #8B0000, #6B0000); border-bottom: 3px solid #DAA520;">
                 <h5 class="modal-title font-weight-bold" id="signModalLabel">Sign Official Petition</h5>
                 <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -585,17 +587,17 @@
                     <!-- FIELD PROCESSING LAYOUT -->
                     <div class="row">
                         <div class="col-md-6 form-group">
-                            <label class="font-weight-bold small text-uppercase" style="color:#1a3a5c;">{{ form.full_name.label }} *</label>
+                            <label class="font-weight-bold small text-uppercase" style="color:#8B0000;">{{ form.full_name.label }} *</label>
                             {{ form.full_name(class="form-control", placeholder="First & Last Name", required=True) }}
                         </div>
                         <div class="col-md-6 form-group">
-                            <label class="font-weight-bold small text-uppercase" style="color:#1a3a5c;">{{ form.enrollment_id.label }} *</label>
+                            <label class="font-weight-bold small text-uppercase" style="color:#8B0000;">{{ form.enrollment_id.label }} *</label>
                             {{ form.enrollment_id(class="form-control", placeholder="Lumbee Enrollment ID", required=True) }}
                         </div>
                     </div>
 
                     <div class="form-group my-3">
-                        <label class="font-weight-bold small text-uppercase" style="color:#1a3a5c;">{{ form.id_upload.label }} *</label>
+                        <label class="font-weight-bold small text-uppercase" style="color:#8B0000;">{{ form.id_upload.label }} *</label>
                         <div class="custom-file">
                             {{ form.id_upload(class="form-control-file", required=True) }}
                         </div>
@@ -604,11 +606,11 @@
 
                     <div class="row">
                         <div class="col-md-6 form-group">
-                            <label class="font-weight-bold small text-uppercase" style="color:#1a3a5c;">{{ form.email.label }} *</label>
+                            <label class="font-weight-bold small text-uppercase" style="color:#8B0000;">{{ form.email.label }} *</label>
                             {{ form.email(class="form-control", placeholder="name@domain.com", required=True) }}
                         </div>
                         <div class="col-md-6 form-group">
-                            <label class="font-weight-bold small text-uppercase" style="color:#1a3a5c;">{{ form.phone.label }}</label>
+                            <label class="font-weight-bold small text-uppercase" style="color:#8B0000;">{{ form.phone.label }}</label>
                             {{ form.phone(class="form-control", placeholder="(910) 555-0100") }}
                         </div>
                     </div>
@@ -622,8 +624,8 @@
 
                 </div>
                 <div class="modal-footer bg-light">
-                    <button type="button" class="btn btn-secondary btn-sm font-weight-bold px-3" data-dismiss="modal">Cancel</button>
-                    <button type="submit" id="signBtn" class="btn btn-success btn-sm px-4 font-weight-bold" disabled>✍️ Confirm & Sign</button>
+                    <button type="button" class="font-weight-bold" data-dismiss="modal" style="background:#fff; color:#8B0000; border:2px solid #8B0000; padding:8px 20px; border-radius:50px; font-size:0.9rem;">Cancel</button>
+                    <button type="submit" id="signBtn" class="font-weight-bold" disabled style="background: linear-gradient(135deg, #8B0000, #6B0000); color:#fff; border:none; padding:8px 24px; border-radius:50px; font-size:0.9rem; box-shadow:0 4px 15px rgba(139,0,0,0.2);">✍️ Confirm & Sign</button>
                 </div>
             </form>
         </div>

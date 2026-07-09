@@ -57,7 +57,7 @@
     </p>
 
     <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
-      <a href="/sign" style="
+      <a href="{{ url_for('main_bp.sign_petition') }}" style="
         background: #DAA520;
         color: #1a0000;
         padding: 16px 40px;
@@ -69,7 +69,7 @@
         transition: transform 0.2s;
       ">✍️ Sign the Petition</a>
 
-      <a href="/ordinance" style="
+      <a href="{{ url_for('main_bp.sign_petition') }}#ordinance" style="
         background: transparent;
         color: white;
         padding: 16px 40px;
@@ -171,7 +171,7 @@
       of <strong>{{ settings.target_signatures }}</strong> signatures
     </p>
 
-    <a href="/sign" style="
+    <a href="{{ url_for('main_bp.sign_petition') }}" style="
       display: inline-block;
       background: linear-gradient(135deg, #8B0000, #6B0000);
       color: white;
@@ -199,12 +199,12 @@
     "Voted yes. Voted no. This is better."
   </p>
   <div style="display:flex; gap:16px; justify-content:center; flex-wrap:wrap;">
-    <a href="/sign" style="
+    <a href="{{ url_for('main_bp.sign_petition') }}" style="
       background:#DAA520; color:#1a0000;
       padding:14px 36px; border-radius:50px;
       font-weight:700; text-decoration:none; font-size:1rem;
     ">✍️ Sign Now</a>
-    <a href="/ordinance" style="
+    <a href="{{ url_for('main_bp.sign_petition') }}#ordinance" style="
       background:transparent; color:white;
       padding:14px 36px; border-radius:50px;
       font-weight:700; text-decoration:none; font-size:1rem;
@@ -312,3 +312,4 @@
 </script>
 
 {% endblock %}
+
