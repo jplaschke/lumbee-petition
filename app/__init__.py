@@ -1,4 +1,4 @@
-from flask import Flask, abort, request
+from flask import Flask, abort, request, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_mail import Mail
@@ -69,6 +69,16 @@ def create_app():
     from app.routes import main_bp, admin_bp
     app.register_blueprint(main_bp)
     app.register_blueprint(admin_bp)
+
+    # ── Custom Error Pages ──────────────────────────────────────
+    @app.errorhandler(404)
+    def not_found(e):
+        return render_template('404.html'), 404
+
+    @app.errorhandler(500)
+    def internal_error(e):
+        db.session.rollback()  # clear any broken transaction so the error page itself can query settings
+        return render_template('500.html'), 500
 
     # ── Global Template Context ────────────────────────────────
     @app.context_processor

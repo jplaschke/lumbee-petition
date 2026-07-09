@@ -3,45 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 – Page Not Found</title>
+    <title>Page Not Found | Lumbee Gaming Ordinance Petition</title>
     <style>
+        * { box-sizing: border-box; }
         body {
-            font-family: Arial, sans-serif;
-            background: #f8f9fa;
+            font-family: system-ui, sans-serif;
+            background: linear-gradient(135deg, #6B0000 0%, #8B0000 50%, #A00000 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
+            padding: 20px;
         }
         .box {
             text-align: center;
-            padding: 3rem;
+            padding: 48px 40px;
             background: white;
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            max-width: 480px;
+            border-top: 6px solid #DAA520;
         }
-        h1 { font-size: 5rem; color: #dc3545; margin: 0; }
-        h2 { color: #343a40; }
-        p  { color: #6c757d; }
-        a  {
+        .badge {
             display: inline-block;
-            margin-top: 1rem;
-            padding: 0.6rem 1.4rem;
-            background: #0d6efd;
-            color: white;
-            border-radius: 6px;
-            text-decoration: none;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #DAA520;
+            font-weight: 700;
+            margin-bottom: 8px;
         }
-        a:hover { background: #0b5ed7; }
+        h1 {
+            font-size: 4.5rem;
+            color: #8B0000;
+            margin: 0;
+            font-weight: 800;
+            line-height: 1;
+        }
+        h2 {
+            color: #222;
+            margin: 12px 0 8px;
+            font-size: 1.4rem;
+        }
+        p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+        .actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        a.btn {
+            display: inline-block;
+            padding: 12px 28px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+        a.btn-primary {
+            background: linear-gradient(135deg, #8B0000, #6B0000);
+            color: white;
+            box-shadow: 0 4px 15px rgba(139,0,0,0.25);
+        }
+        a.btn-outline {
+            background: transparent;
+            color: #8B0000;
+            border: 2px solid #8B0000;
+        }
     </style>
 </head>
 <body>
     <div class="box">
+        <div class="badge">Lumbee Tribe of North Carolina</div>
         <h1>404</h1>
         <h2>Page Not Found</h2>
-        <p>The page you're looking for doesn't exist or has been moved.</p>
-        <a href="/">← Go Home</a>
+        <p>The page you're looking for doesn't exist or may have moved. Here's how to get back on track.</p>
+        <div class="actions">
+            <a href="/petition" class="btn btn-primary">✍️ Sign the Petition</a>
+            <a href="/ordinance" class="btn btn-outline">📜 Read the Ordinance</a>
+        </div>
     </div>
 </body>
 </html>
