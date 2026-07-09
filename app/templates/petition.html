@@ -659,7 +659,7 @@
     signBtn.disabled = true;
     signBtn.textContent = "Processing Signature...";
     
-    fetch("{{ url_for('main_bp.petition') }}", {
+    fetch("{{ url_for('main_bp.sign_petition') }}", {
         method: "POST",
         body: formData,
         headers: {
