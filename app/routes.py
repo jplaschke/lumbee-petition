@@ -204,5 +204,5 @@ def download_ordinance_pdf():
 def dashboard():
     settings = SiteSettings.query.first()
     signers = Signer.query.order_by(Signer.signed_at.desc()).all()
-    return render_template('admin/dashboard.html', settings=settings, signers=signers)a
+    return render_template('admin/dashboard.html', settings=settings, signers=signers)
 
