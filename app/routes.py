@@ -10,8 +10,13 @@ from app.utils import compute_sha256
 main_bp = Blueprint('main_bp', __name__)
 admin_bp = Blueprint('admin_bp', __name__)
 
+@main_bp.route('/', methods=['GET'])
+def index():
+    # This completely satisfies url_for('main_bp.index')
+    return redirect(url_for('main_bp.sign_petition'))
+
 # ── FIXED ROOT ROUTE ─────────────────────────────────────────────────
-@main_bp.route('/', methods=['GET', 'POST'])
+@main_bp.route('/petition', methods=['GET', 'POST'])
 def sign_petition():
     form = SignatureForm()
 
