@@ -78,7 +78,7 @@
     <div class="hash-value">{{ current_hash }}</div>
     <div class="hash-meta">
       Computed: {{ hash_timestamp }} &nbsp;|&nbsp;
-      Text Length: {{ text_length }} characters &nbsp;|&nbsp;
+      File Size: {{ file_size_kb }} KB &nbsp;|&nbsp;
       Version: {{ hash_version }}
     </div>
     <div class="hash-instruction">
@@ -159,14 +159,14 @@
     <div class="committee-grid">
       {% for member in committee_members %}
       <div class="committee-card">
-        <div class="committee-role">{{ member.role }}</div>
-        <div class="committee-name">{{ member.name }}</div>
+        <div class="committee-role">Committee Member {{ loop.index }}</div>
+        <div class="committee-name">{{ member.full_name or 'Position Unfilled' }}</div>
         <div class="committee-enrollment">
-          Enrollment No.: {{ member.enrollment_number }}
+          Enrollment No.: {{ member.enrollment_id or 'Pending' }}
         </div>
         <div class="committee-cert-line">
           <span class="cert-label">Certified:</span>
-          <span class="cert-date">{{ member.certified_date or '_______________' }}</span>
+          <span class="cert-date">{{ member.assigned_at.strftime('%B %d, %Y') if member.assigned_at else '_______________' }}</span>
         </div>
       </div>
       {% endfor %}

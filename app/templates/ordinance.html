@@ -212,8 +212,8 @@
        SHA-256 VERIFICATION BANNER
   ══════════════════════════════════════ -->
   <div class="verification-banner">
-    <span class="hash-label">🔐 SHA-256 VERIFIED:</span>
-    <span class="hash-value">f9488c4b9f4381867adcf6555cad7fa7e984374ceb2c7f1f2abb3f679578cf82</span>
+    <span class="hash-label">🔐 SHA-256 {{ 'VERIFIED' if hash_match else 'UNVERIFIED' }}:</span>
+    <span class="hash-value">{{ current_hash }}</span>
   </div>
 
   <!-- ══════════════════════════════════════
@@ -259,7 +259,7 @@
     </a>
     <div class="sha-box">
       🔐 SHA-256 Document Verification:<br>
-      f9488c4b9f4381867adcf6555cad7fa7e984374ceb2c7f1f2abb3f679578cf82
+      {{ current_hash }}
     </div>
   </div>
 
