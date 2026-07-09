@@ -199,7 +199,7 @@
       {% if current_hash %}
       <div class="alert mb-3" style="background:#0d1b2a; color:#00ff88; font-family:monospace; border:1px solid #00ff88;">
         <div style="font-size:0.75rem; opacity:0.7; margin-bottom:4px;">
-          ✅ CURRENT VERIFIED HASH — {{ current_hash.timestamp.strftime('%B %d, %Y at %I:%M %p UTC') }}
+          ✅ CURRENT LOGGED HASH — {{ current_hash.timestamp.strftime('%B %d, %Y at %I:%M %p UTC') }}
         </div>
         <div style="font-size:0.95rem; word-break:break-all; font-weight:700;">
           {{ current_hash.sha256_hash }}
@@ -211,50 +211,47 @@
         {% endif %}
       </div>
 
-      <!-- Known Baseline Hash from Document -->
+      <!-- Live PDF-on-disk vs Logged Hash -->
       <div class="alert mb-3" style="background:#2d1b00; color:#ffcc44; font-family:monospace; border:1px solid #ffcc44;">
         <div style="font-size:0.75rem; opacity:0.7; margin-bottom:4px;">
-          📄 DOCUMENT BASELINE HASH (from uploaded ordinance record)
-        </div>
-        <div style="font-size:0.95rem; word-break:break-all; font-weight:700;">
-          f9488c4b9f4381867adcf6555cad7fa7e984374ceb2c7f1f2abb3f679578cf82
+          📄 LIVE ORDINANCE PDF ON DISK &nbsp;({{ file_size_kb }} KB)
         </div>
         <div class="mt-2" style="font-size:0.8rem;">
-          {% if current_hash.sha256_hash == 'f9488c4b9f4381867adcf6555cad7fa7e984374ceb2c7f1f2abb3f679578cf82' %}
-            <span style="color:#00ff88;">✅ MATCH — Document integrity verified</span>
+          {% if pdf_hash_match %}
+            <span style="color:#00ff88;">✅ MATCH — The PDF currently on the server matches the logged hash above</span>
           {% else %}
-            <span style="color:#ff6b6b;">⚠️ MISMATCH — Document has been modified from baseline</span>
+            <span style="color:#ff6b6b;">⚠️ MISMATCH — The PDF on the server does not match the last logged hash. Re-upload it below to log its current hash.</span>
           {% endif %}
         </div>
       </div>
       {% else %}
       <div class="alert alert-warning">
-        ⚠️ No hash recorded yet. Save the ordinance text below to generate the first hash.
+        ⚠️ No hash recorded yet. Upload the ordinance PDF below to generate the first hash.
       </div>
       {% endif %}
 
-      <!-- Save Ordinance Text + Generate Hash -->
+      <!-- Upload Ordinance PDF + Generate Hash -->
       <div class="card border-secondary mb-3">
         <div class="card-header bg-secondary text-white">
-          📝 Save Ordinance Text & Generate New Hash
+          📎 Upload Ordinance PDF &amp; Generate New Hash
         </div>
         <div class="card-body">
-          <form method="POST" action="{{ url_for('admin_bp.save_ordinance') }}">
+          <form method="POST" action="{{ url_for('admin_bp.upload_ordinance_pdf') }}" enctype="multipart/form-data">
+            {{ upload_form.hidden_tag() }}
             <div class="mb-2">
-              <label class="form-label small fw-bold">Ordinance Text (paste full text to hash)</label>
-              <textarea name="ordinance_text" class="form-control"
-                rows="6"
-                placeholder="Paste the full ordinance text here to compute and log its SHA-256 fingerprint..."
-                style="font-family:monospace; font-size:0.8rem;">{{ settings.ordinance_text if settings and settings.ordinance_text else '' }}</textarea>
+              <label class="form-label small fw-bold">{{ upload_form.pdf_file.label }}</label>
+              {{ upload_form.pdf_file(class='form-control') }}
+              <div class="form-text">Uploading a new PDF replaces the official ordinance record and generates a new SHA-256 hash automatically.</div>
+              {% if upload_form.pdf_file.errors %}
+                {% for error in upload_form.pdf_file.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              {% endif %}
             </div>
             <div class="mb-2">
-              <input type="text" name="change_note" class="form-control form-control-sm"
-                placeholder="Change note (e.g. 'Added Section 7 language', 'Corrected typo in Section 3')"
-                value="">
+              {{ upload_form.change_note(class='form-control form-control-sm', placeholder="Change note (e.g. 'Corrected typo in Section 3')") }}
             </div>
-            <button type="submit" class="btn btn-dark btn-sm">
-              🔐 Save & Compute Hash
-            </button>
+            {{ upload_form.submit(class='btn btn-dark btn-sm') }}
           </form>
         </div>
       </div>
