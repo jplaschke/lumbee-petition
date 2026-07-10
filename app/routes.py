@@ -227,7 +227,8 @@ def sign_petition():
 
     home_summary = (
         "This petition acts as a direct community initiative to protect the integrity of our foundational documents. "
-        "By verifying and logging structural changes via SHA-256 cryptographic hashes, we ensure transparency and member consent. In non-technical, terms NO ONE can change the proposed ordinance after you have signed it. There can be no modifications. What you read here is what will be submitted."
+        "By verifying and logging structural changes via SHA-256 cryptographic hashes, we ensure transparency and member consent. In non-technical terms, NO ONE can change the proposed ordinance after you have signed it." 
+        "No post signature modifications can be done because they will identified and caught."
     )
 
     return render_template(
