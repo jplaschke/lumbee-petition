@@ -2,6 +2,7 @@ import hashlib
 import datetime
 from app import db
 from flask_login import UserMixin
+from app.utils.crypto_utils import EncryptedString
 
 
 class AdminUser(db.Model, UserMixin):
@@ -15,15 +16,16 @@ class AdminUser(db.Model, UserMixin):
 class Signer(db.Model):
     __tablename__ = 'signer'
     id              = db.Column(db.Integer, primary_key=True)
-    full_name       = db.Column(db.String(200), nullable=False)
-    enrollment_id   = db.Column(db.String(100), nullable=False, unique=True)
-    email           = db.Column(db.String(150), nullable=True)
-    phone           = db.Column(db.String(30),  nullable=True)
+    full_name       = db.Column(EncryptedString, nullable=False)
+    enrollment_id   = db.Column(db.String(100), nullable=False, unique=True)  # kept plaintext - required for exact-match duplicate lookups
+    email           = db.Column(EncryptedString, nullable=True)
+    phone           = db.Column(EncryptedString, nullable=True)
     id_upload_path  = db.Column(db.String(300), nullable=True)
     ip_address      = db.Column(db.String(50),  nullable=True)
     timestamp       = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     verified        = db.Column(db.Boolean, default=False)
     receipt_sent    = db.Column(db.Boolean, default=False)
+    signature       = db.Column(db.Text, nullable=True)  # base64 RSA signature - see app/utils/crypto_utils.py
 
 
 class DuplicateAttempt(db.Model):
@@ -33,9 +35,9 @@ class DuplicateAttempt(db.Model):
     """
     __tablename__ = 'duplicate_attempt'
     id            = db.Column(db.Integer, primary_key=True)
-    full_name     = db.Column(db.String(200), nullable=True)
+    full_name     = db.Column(EncryptedString, nullable=True)
     enrollment_id = db.Column(db.String(100), nullable=False)
-    email         = db.Column(db.String(150), nullable=True)
+    email         = db.Column(EncryptedString, nullable=True)
     ip_address    = db.Column(db.String(50),  nullable=True)
     timestamp     = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
@@ -57,6 +59,13 @@ class SiteSettings(db.Model):
     header_image        = db.Column(db.String(300), nullable=True)
     background_image    = db.Column(db.String(300), nullable=True)
     petition_start_date = db.Column(db.DateTime, nullable=True)
+
+    # ── Signature collection gating (Step 5 readiness) ──
+    committee_finalized      = db.Column(db.Boolean, default=False)
+    committee_finalized_at   = db.Column(db.DateTime, nullable=True)
+    ordinance_finalized       = db.Column(db.Boolean, default=False)
+    ordinance_finalized_hash  = db.Column(db.String(64), nullable=True)
+    ordinance_finalized_at    = db.Column(db.DateTime, nullable=True)
 
     def __repr__(self):
         return f'<SiteSettings id={self.id}>'

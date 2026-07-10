@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 760px; margin: 40px auto; padding: 40px; background: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border-top: 6px solid #DAA520; font-family: system-ui, sans-serif; color: #333;">
+
+  <div style="text-align: center; margin-bottom: 30px;">
+    <p style="font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; color: #DAA520; margin-bottom: 6px; font-weight: 700;">Lumbee Tribe of North Carolina</p>
+    <h1 style="color: #8B0000; margin: 0; font-size: 1.9rem; font-weight: 800;">🔒 Privacy &amp; Data Use Policy</h1>
+  </div>
+
+  <div style="background: #fdf6f6; border-left: 4px solid #8B0000; border-radius: 6px; padding: 20px 24px; margin-bottom: 28px;">
+    <p style="margin: 0; font-weight: 700; color: #8B0000; font-size: 1.05rem;">
+      Your personal data submitted through this petition is used only to verify your
+      eligibility to sign and to support certification of this petition by the Tribal
+      Council. It will be encrypted and deleted after the petition results are certified.
+    </p>
+  </div>
+
+  <h2 style="color: #8B0000; font-size: 1.2rem; margin-top: 28px;">What information we collect</h2>
+  <p style="line-height: 1.7;">
+    When you sign this petition, we collect your full legal name, enrollment ID, email
+    address, optional phone number, and an uploaded copy of your Lumbee membership ID.
+    We also record the IP address the submission came from and the date and time you signed.
+  </p>
+
+  <h2 style="color: #8B0000; font-size: 1.2rem; margin-top: 28px;">How we use this information</h2>
+  <p style="line-height: 1.7;">
+    This information is used exclusively for two purposes:
+  </p>
+  <ul style="line-height: 1.8;">
+    <li><strong>Verifying eligibility</strong> — confirming that each signer is a registered enrolled member of the Lumbee Tribe, and preventing duplicate signatures from the same enrollment ID.</li>
+    <li><strong>Certification by the Tribal Council</strong> — providing the Petition Committee and Tribal Council the records needed to certify that this petition meets the requirements of Article V of the Lumbee Constitution.</li>
+  </ul>
+  <p style="line-height: 1.7;">
+    We do not sell, rent, or share your personal information with any third party for
+    marketing or any other unrelated purpose. We do not use your data for any purpose
+    beyond what's described on this page.
+  </p>
+
+  <h2 style="color: #8B0000; font-size: 1.2rem; margin-top: 28px;">How we protect your information</h2>
+  <p style="line-height: 1.7;">
+    Sensitive personal fields (your name, email, and phone number) are encrypted at rest
+    in our database. Each recorded signature is also digitally signed by our system at
+    the moment it's submitted, creating a tamper-evident record that proves your signature
+    entry has not been altered after the fact.
+  </p>
+
+  <h2 style="color: #8B0000; font-size: 1.2rem; margin-top: 28px;">Data retention and deletion</h2>
+  <p style="line-height: 1.7;">
+    We retain your personal data only as long as necessary to complete the petition and
+    certification process. Once the Tribal Council has certified the results of this
+    petition, your personal identifying information will be deleted from our systems.
+    Aggregate, de-identified signature counts may be retained for historical record-keeping.
+  </p>
+
+  <h2 style="color: #8B0000; font-size: 1.2rem; margin-top: 28px;">Your uploaded ID</h2>
+  <p style="line-height: 1.7;">
+    The membership ID image you upload is used solely to verify your enrollment status.
+    It is stored separately from publicly-accessible areas of our website and is not
+    displayed publicly at any point.
+  </p>
+
+  <h2 style="color: #8B0000; font-size: 1.2rem; margin-top: 28px;">Questions</h2>
+  <p style="line-height: 1.7;">
+    If you have questions about how your information is used or want to request early
+    deletion of your data, please contact the Petition Committee through the contact
+    information provided on the ordinance page.
+  </p>
+
+  <div style="text-align: center; margin-top: 36px;">
+    <a href="{{ url_for('main_bp.sign_petition') }}" style="display:inline-block; background: linear-gradient(135deg, #8B0000, #6B0000); color: #fff; padding: 12px 32px; border-radius: 50px; font-weight: 700; text-decoration: none;">← Back to the Petition</a>
+  </div>
+
+</div>
+{% endblock %}
+

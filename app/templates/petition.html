@@ -434,9 +434,15 @@
             </div>
 
             <!-- MODAL BUTTON TRIGGER -->
+            {% if signature_collection_open %}
             <button type="button" class="font-weight-bold" data-bs-toggle="modal" data-bs-target="#signPetitionModal" style="background: linear-gradient(135deg, #8B0000, #6B0000); border: none; color: #fff; padding: 12px 32px; border-radius: 50px; font-size: 1rem; box-shadow: 0 4px 15px rgba(139,0,0,0.25); cursor: pointer;">
                 ✍️ Sign Petition
             </button>
+            {% else %}
+            <div style="display:flex; align-items:center; gap:10px; background:#fdf6f6; border:1px solid #f0d0d0; border-radius:50px; padding:10px 22px; font-size:0.85rem; color:#8B0000; font-weight:600;">
+                🔒 Signature collection has not opened yet — the Petition Committee and official ordinance must be finalized first.
+            </div>
+            {% endif %}
         </div>
     </div>
   </div>
@@ -617,6 +623,9 @@
                         <label class="form-check-label text-secondary small font-weight-bold" for="legalConsentCheck" style="cursor: pointer;">
                             I provide legal consent to attach my signature verification record to this public registry log.
                         </label>
+                    </div>
+                    <div class="mt-2">
+                        <small class="text-muted">By signing, you agree to our <a href="{{ url_for('main_bp.privacy_policy') }}" target="_blank" style="color:#8B0000; font-weight:600;">Privacy &amp; Data Use Policy</a>.</small>
                     </div>
 
                 </div>

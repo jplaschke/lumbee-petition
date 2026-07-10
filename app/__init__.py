@@ -2,18 +2,24 @@ from flask import Flask, abort, request, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_mail import Mail
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from pathlib import Path
 import os
 
 db = SQLAlchemy()
 login_manager = LoginManager()
 mail = Mail()
+limiter = Limiter(key_func=get_remote_address)
 
 
 def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'change-me')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+    # Cap request body size (protects against large-file upload abuse)
+    app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10 MB
 
     # ── Email Configuration ────────────────────────────────────
     app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
@@ -56,6 +62,7 @@ def create_app():
     db.init_app(app)
     login_manager.init_app(app)
     mail.init_app(app)
+    limiter.init_app(app)
     login_manager.login_view = 'main_bp.login'
 
     # ── User Loader ────────────────────────────────────────────
@@ -90,6 +97,17 @@ def create_app():
     # ── Create Tables & Seed Defaults ─────────────────────────
     with app.app_context():
         db.create_all()
+
+        if not os.environ.get('FIELD_ENCRYPTION_KEY'):
+            app.logger.warning(
+                "FIELD_ENCRYPTION_KEY is not set - signer PII fields cannot be "
+                "encrypted or decrypted until this is configured. See app/utils/crypto_utils.py."
+            )
+        if not os.environ.get('RSA_PRIVATE_KEY_B64'):
+            app.logger.warning(
+                "RSA_PRIVATE_KEY_B64 is not set - signature records will not be "
+                "cryptographically signed until this is configured. See app/utils/crypto_utils.py."
+            )
 
         # Seed admin user from ENV
         from app.models import AdminUser

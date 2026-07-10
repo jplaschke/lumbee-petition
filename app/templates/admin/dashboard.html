@@ -173,13 +173,39 @@
       </div>
 
       <!-- Article V Notice -->
-      <div class="alert alert-secondary mt-3 mb-0" style="font-size:0.85rem;">
+      <div class="alert alert-secondary mt-3 mb-3" style="font-size:0.85rem;">
         <strong>📜 Article V — Initiative:</strong>
         The petition committee consists of three enrolled members who are responsible for
         circulating the petition, verifying signatures, and submitting the completed petition
         to the tribal government for certification. Each member must be an enrolled member
         of the Lumbee Tribe of North Carolina.
       </div>
+
+      <!-- Committee Finalization -->
+      {% set filled_count = committee | selectattr('is_filled') | list | length %}
+      {% if settings and settings.committee_finalized %}
+        <div class="alert alert-success d-flex justify-content-between align-items-center flex-wrap gap-2 mb-0">
+          <div>
+            ✅ <strong>Committee Finalized</strong> — locked on {{ settings.committee_finalized_at.strftime('%B %d, %Y at %I:%M %p UTC') if settings.committee_finalized_at else '—' }}
+          </div>
+          <form method="POST" action="{{ url_for('admin_bp.finalize_committee') }}" onsubmit="return confirm('Un-finalizing will close signature collection until the committee is finalized again. Continue?');">
+            <input type="hidden" name="action" value="unfinalize">
+            <button type="submit" class="btn btn-sm btn-outline-danger">Reverse Finalization</button>
+          </form>
+        </div>
+      {% else %}
+        <div class="alert alert-warning d-flex justify-content-between align-items-center flex-wrap gap-2 mb-0">
+          <div>
+            ⏳ <strong>Not Finalized</strong> — {{ filled_count }} of 3 slots filled. Signature collection stays closed until finalized.
+          </div>
+          <form method="POST" action="{{ url_for('admin_bp.finalize_committee') }}" onsubmit="return confirm('This certifies all 3 committee members are correct and final. Continue?');">
+            <input type="hidden" name="action" value="finalize">
+            <button type="submit" class="btn btn-sm btn-dark" {{ 'disabled' if filled_count < 3 else '' }}>
+              ✅ Finalize Committee
+            </button>
+          </form>
+        </div>
+      {% endif %}
     </div>
   </div>
 
@@ -228,6 +254,37 @@
       <div class="alert alert-warning">
         ⚠️ No hash recorded yet. Upload the ordinance PDF below to generate the first hash.
       </div>
+      {% endif %}
+
+      <!-- Ordinance Finalization -->
+      {% if settings and settings.ordinance_finalized %}
+        <div class="alert alert-success d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+          <div>
+            ✅ <strong>Ordinance Finalized</strong> — locked on {{ settings.ordinance_finalized_at.strftime('%B %d, %Y at %I:%M %p UTC') if settings.ordinance_finalized_at else '—' }}
+            <div style="font-family:monospace; font-size:0.75rem; word-break:break-all; margin-top:4px;">{{ settings.ordinance_finalized_hash }}</div>
+          </div>
+          <form method="POST" action="{{ url_for('admin_bp.finalize_ordinance') }}" onsubmit="return confirm('Un-finalizing will close signature collection until the ordinance is finalized again. Continue?');">
+            <input type="hidden" name="action" value="unfinalize">
+            <button type="submit" class="btn btn-sm btn-outline-danger">Reverse Finalization</button>
+          </form>
+        </div>
+      {% else %}
+        <div class="alert alert-warning d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+          <div>⏳ <strong>Not Finalized</strong> — signature collection stays closed until this is finalized.</div>
+          <form method="POST" action="{{ url_for('admin_bp.finalize_ordinance') }}" onsubmit="return confirm('This locks in the current PDF hash as the official version signers are certifying against. Continue?');">
+            <input type="hidden" name="action" value="finalize">
+            <button type="submit" class="btn btn-sm btn-dark" {{ 'disabled' if not current_hash or not pdf_hash_match else '' }}>
+              ✅ Finalize Ordinance Hash
+            </button>
+          </form>
+        </div>
+      {% endif %}
+
+      {% if public_key_pem %}
+      <details class="mb-3">
+        <summary class="small text-muted" style="cursor:pointer;">🔑 Show public verification key (for independent signature verification)</summary>
+        <pre class="small p-2 mt-2" style="background:#f4f4f4; border-radius:4px; white-space:pre-wrap; word-break:break-all;">{{ public_key_pem }}</pre>
+      </details>
       {% endif %}
 
       <!-- Upload Ordinance PDF + Generate Hash -->
@@ -406,6 +463,34 @@
           No duplicate attempts recorded.
         </div>
       {% endif %}
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       DANGER ZONE — GO LIVE
+  ═══════════════════════════════════════════════ -->
+  <div id="danger-zone" class="card shadow-sm mb-4 border-danger">
+    <div class="card-header bg-danger text-white">
+      <h5 class="mb-0">🚀 Go Live — Clear Test Signatures</h5>
+      <small style="opacity:0.9;">Irreversible. Use this once, right before opening real signature collection.</small>
+    </div>
+    <div class="card-body">
+      <p class="mb-2">
+        This permanently deletes <strong>all {{ count }} signature record(s)</strong> and all duplicate-attempt
+        logs currently in the database. Use this to clear out test/demo signatures before real signature
+        collection begins. This does <strong>not</strong> affect the ordinance PDF, its hash log, or committee members.
+      </p>
+      <p class="mb-3 text-danger small">
+        <strong>This cannot be undone.</strong> Make sure any signatures currently in the database are test data only.
+      </p>
+      <form method="POST" action="{{ url_for('admin_bp.reset_test_signatures') }}"
+            onsubmit="return confirm('This will permanently delete all signature and duplicate-attempt records. This cannot be undone. Continue?');">
+        <div class="mb-2">
+          <label class="form-label small fw-bold">Type <code>DELETE ALL TEST SIGNATURES</code> to confirm:</label>
+          <input type="text" name="confirm_text" class="form-control" placeholder="DELETE ALL TEST SIGNATURES" required>
+        </div>
+        <button type="submit" class="btn btn-danger">🗑️ Permanently Clear All Signatures</button>
+      </form>
     </div>
   </div>
 
